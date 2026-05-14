@@ -6,6 +6,7 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:easysaloonapp/core/widgets/salon_loader.dart';
 import 'package:lottie/lottie.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -98,28 +99,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Lottie.network(
-                'https://assets10.lottiefiles.com/packages/lf20_pqnfmone.json', 
-                width: 120,
-                repeat: false,
-              ),
-              SizedBox(height: 24.h),
-              Text(
-                'Account Created!',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: AppColors.primary),
-              ),
-              SizedBox(height: 12.h),
-              const Text(
-                'Your luxury journey begins now. We are taking you to your dashboard.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70),
-              ),
-              SizedBox(height: 32.h),
-              const CircularProgressIndicator(color: AppColors.primary),
-            ],
+          child: const SalonLoader(
+            size: 140,
+            message: "Account Created Successfully\nRedirecting to your luxury space",
           ),
         ),
       ),
@@ -263,7 +245,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ? const SizedBox(
                                       height: 20, 
                                       width: 20, 
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                                      child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
                                     )
                                   : const Text('CREATE ACCOUNT →'),
                             ),

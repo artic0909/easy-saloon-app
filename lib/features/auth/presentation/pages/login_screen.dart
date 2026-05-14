@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
+import 'package:easysaloonapp/core/widgets/salon_loader.dart';
 import 'package:lottie/lottie.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -79,19 +80,17 @@ class _LoginScreenState extends State<LoginScreen> {
       Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Lottie.network(
-              'https://assets10.lottiefiles.com/packages/lf20_pqnfmone.json',
-              width: 150,
-              repeat: false,
-            ),
-            const Text(
-              'Signing you in...',
-              style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-            ),
-          ],
+        child: Container(
+          padding: EdgeInsets.all(32.w),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          ),
+          child: const SalonLoader(
+            size: 120,
+            message: "Authentication Successful\nPreparing your dashboard",
+          ),
         ),
       ),
     );
@@ -174,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ? const SizedBox(
                                       height: 20, 
                                       width: 20, 
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                                      child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
                                     )
                                   : const Text('SIGN IN →'),
                             ),
