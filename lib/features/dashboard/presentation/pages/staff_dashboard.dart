@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 
 class StaffDashboard extends StatelessWidget {
@@ -7,10 +9,18 @@ class StaffDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Get.find<AuthService>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staff Dashboard'),
         backgroundColor: AppColors.background,
+        actions: [
+          IconButton(
+            onPressed: () => authService.logout(),
+            icon: const Icon(Icons.logout, color: AppColors.primary),
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(24.w),

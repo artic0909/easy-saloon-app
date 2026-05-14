@@ -1,37 +1,54 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' as get_pkg;
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/network/api_service.dart';
+import 'package:easysaloonapp/core/network/api_service.dart';
 
-class AuthService extends get_pkg.GetxService {
+class AuthService extends GetxService {
   final ApiService _apiService = ApiService();
   
-  final _isLoggedIn = false.obs;
-  final _userData = {}.obs;
+  final RxBool _isLoggedIn = false.obs;
+  final RxMap<String, dynamic> _userData = <String, dynamic>{}.obs;
 
   bool get isLoggedIn => _isLoggedIn.value;
-  Map get userData => _userData.value;
+  Map<String, dynamic> get userData => _userData;
 
   Future<AuthService> init() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
+    final userJson = prefs.getString('user_data');
+    
     if (token != null) {
-      try {
-        final response = await _apiService.dio.get('/profile');
-        if (response.data['status'] == 'success') {
-          _userData.value = response.data['data'];
-          _isLoggedIn.value = true;
-        } else {
-          await prefs.remove('access_token');
-          _isLoggedIn.value = false;
+      _isLoggedIn.value = true;
+      if (userJson != null) {
+        try {
+          final Map<String, dynamic> decoded = jsonDecode(userJson);
+          _userData.assignAll(decoded);
+        } catch (e) {
+          // Fallback if JSON is malformed
         }
-      } catch (e) {
-        // If profile fetch fails (e.g. token expired on server), logout
-        await prefs.remove('access_token');
-        _isLoggedIn.value = false;
       }
+      
+      // Silently refresh profile in background
+      _refreshProfile();
     }
     return this;
+  }
+
+  Future<void> _refreshProfile() async {
+    try {
+      final response = await _apiService.dio.get('/profile');
+      if (response.data['status'] == 'success') {
+        final Map<String, dynamic> user = response.data['data'];
+        _userData.assignAll(user);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_data', jsonEncode(user));
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        logout(); 
+      }
+    }
   }
 
   Future<Map<String, dynamic>> login(String login, String password) async {
@@ -44,12 +61,13 @@ class AuthService extends get_pkg.GetxService {
       if (response.data['status'] == 'success') {
         final data = response.data['data'];
         final token = data['access_token'];
-        final user = data['user'];
+        final user = Map<String, dynamic>.from(data['user']);
         
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', token);
+        await prefs.setString('user_data', jsonEncode(user));
         
-        _userData.value = user;
+        _userData.assignAll(user);
         _isLoggedIn.value = true;
         
         return {'success': true, 'role': user['role']};
@@ -98,8 +116,9 @@ class AuthService extends get_pkg.GetxService {
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
+    await prefs.remove('user_data');
     _isLoggedIn.value = false;
-    _userData.value = {};
-    get_pkg.Get.offAllNamed('/login');
+    _userData.clear();
+    Get.offAllNamed('/login');
   }
 }

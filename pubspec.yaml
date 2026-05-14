@@ -69,6 +69,7 @@ flutter:
   assets:
     - assets/login.avif
     - assets/register.avif
+    - assets/home.avif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

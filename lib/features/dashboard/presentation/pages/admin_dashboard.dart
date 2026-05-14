@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -7,10 +9,18 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Get.find<AuthService>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
         backgroundColor: AppColors.background,
+        actions: [
+          IconButton(
+            onPressed: () => authService.logout(),
+            icon: const Icon(Icons.logout, color: AppColors.primary),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
