@@ -16,8 +16,20 @@ class AuthService extends get_pkg.GetxService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
     if (token != null) {
-      _isLoggedIn.value = true;
-      // You might want to fetch profile here to verify token
+      try {
+        final response = await _apiService.dio.get('/profile');
+        if (response.data['status'] == 'success') {
+          _userData.value = response.data['data'];
+          _isLoggedIn.value = true;
+        } else {
+          await prefs.remove('access_token');
+          _isLoggedIn.value = false;
+        }
+      } catch (e) {
+        // If profile fetch fails (e.g. token expired on server), logout
+        await prefs.remove('access_token');
+        _isLoggedIn.value = false;
+      }
     }
     return this;
   }

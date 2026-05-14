@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/login_screen.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +27,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      Get.off(() => const LoginScreen());
+      final authService = Get.find<AuthService>();
+      if (authService.isLoggedIn) {
+        final role = authService.userData['role'];
+        if (role == 'admin') {
+          Get.offAllNamed('/admin-dashboard');
+        } else if (role == 'staff') {
+          Get.offAllNamed('/staff-dashboard');
+        } else {
+          Get.offAllNamed('/home');
+        }
+      } else {
+        Get.offAllNamed('/login');
+      }
     });
   }
 
