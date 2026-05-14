@@ -121,9 +121,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    } catch (e) {
+      // Permission request failed or manifest missing permissions, 
+      // but we shouldn't block the user from entering the app.
+      debugPrint("Location permission error: $e");
     }
   }
 
