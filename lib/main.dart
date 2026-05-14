@@ -8,8 +8,11 @@ import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.d
 import 'package:easysaloonapp/features/home/presentation/pages/home_page.dart';
 import 'package:easysaloonapp/features/dashboard/presentation/pages/staff_dashboard.dart';
 import 'package:easysaloonapp/features/dashboard/presentation/pages/admin_dashboard.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Get.putAsync(() => AuthService().init());
   runApp(const MyApp());
 }
 

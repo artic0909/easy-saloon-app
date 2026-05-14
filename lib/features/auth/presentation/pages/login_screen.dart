@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/home_page.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,17 +17,35 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = Get.find<AuthService>();
+  bool _isLoading = false;
 
-  void _handleLogin() {
-    String email = _emailController.text.trim().toLowerCase();
+  void _handleLogin() async {
+    setState(() => _isLoading = true);
     
-    // Simple role-based routing logic for demonstration
-    if (email.contains('admin')) {
-      Get.offAllNamed('/admin-dashboard');
-    } else if (email.contains('staff')) {
-      Get.offAllNamed('/staff-dashboard');
+    final result = await _authService.login(
+      _emailController.text, 
+      _passwordController.text
+    );
+
+    setState(() => _isLoading = false);
+
+    if (result['success']) {
+      String role = result['role'];
+      if (role == 'admin') {
+        Get.offAllNamed('/admin-dashboard');
+      } else if (role == 'staff') {
+        Get.offAllNamed('/staff-dashboard');
+      } else {
+        Get.offAllNamed('/home');
+      }
     } else {
-      Get.offAll(() => const HomePage());
+      Get.snackbar(
+        'Login Failed',
+        result['message'],
+        backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -102,7 +121,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _handleLogin,
-                            child: const Text('SIGN IN →'),
+                            child: _isLoading 
+                                ? const SizedBox(
+                                    height: 20, 
+                                    width: 20, 
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                                  )
+                                : const Text('SIGN IN →'),
                           ),
                         ),
                         SizedBox(height: 24.h),
