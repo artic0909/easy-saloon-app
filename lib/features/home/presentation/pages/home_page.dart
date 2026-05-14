@@ -300,7 +300,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            coupon['name'] ?? 'Discount Coupon',
+                            coupon['title'] ?? 'Discount Coupon',
                             style: TextStyle(
                               color: AppColors.textOnPrimary.withValues(alpha: 0.8),
                               fontSize: 12.sp,

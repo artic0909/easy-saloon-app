@@ -150,7 +150,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        coupon['name'] ?? 'Luxury Discount',
+                        coupon['title'] ?? 'Luxury Discount',
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp),
                       ),
                       SizedBox(height: 4.h),
