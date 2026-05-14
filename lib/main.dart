@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'core/theme/app_theme.dart';
-import 'features/home/presentation/pages/home_page.dart';
+import 'package:easysaloonapp/core/theme/app_theme.dart';
+import 'package:easysaloonapp/features/auth/presentation/pages/splash_screen.dart';
+import 'package:easysaloonapp/features/auth/presentation/pages/login_screen.dart';
+import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
+import 'package:easysaloonapp/features/home/presentation/pages/home_page.dart';
+import 'package:easysaloonapp/features/dashboard/presentation/pages/staff_dashboard.dart';
+import 'package:easysaloonapp/features/dashboard/presentation/pages/admin_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +18,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initializing ScreenUtil for responsive design
     return ScreenUtilInit(
-      designSize: const Size(375, 812), // Standard iPhone size
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -23,9 +27,15 @@ class MyApp extends StatelessWidget {
           title: 'Easy Saloon',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.light, // Default to light, can be changed later
-          home: const HomePage(),
+          initialRoute: '/',
+          getPages: [
+            GetPage(name: '/', page: () => const SplashScreen()),
+            GetPage(name: '/login', page: () => const LoginScreen()),
+            GetPage(name: '/register', page: () => const RegisterScreen()),
+            GetPage(name: '/home', page: () => const HomePage()),
+            GetPage(name: '/staff-dashboard', page: () => const StaffDashboard()),
+            GetPage(name: '/admin-dashboard', page: () => const AdminDashboard()),
+          ],
         );
       },
     );
