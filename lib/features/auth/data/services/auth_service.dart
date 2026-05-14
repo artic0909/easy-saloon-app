@@ -74,9 +74,18 @@ class AuthService extends GetxService {
       }
       return {'success': false, 'message': response.data['message']};
     } on DioException catch (e) {
+      String message = 'Connection error';
+      Map<String, dynamic>? errors;
+      
+      if (e.response?.data != null) {
+        message = e.response?.data['message'] ?? message;
+        errors = e.response?.data['errors'];
+      }
+      
       return {
         'success': false, 
-        'message': e.response?.data['message'] ?? 'Connection error'
+        'message': message,
+        'errors': errors,
       };
     }
   }
@@ -98,13 +107,35 @@ class AuthService extends GetxService {
       });
 
       if (response.data['status'] == 'success') {
-        return {'success': true};
+        final data = response.data['data'];
+        if (data != null && data['access_token'] != null) {
+          final token = data['access_token'];
+          final user = Map<String, dynamic>.from(data['user']);
+          
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('access_token', token);
+          await prefs.setString('user_data', jsonEncode(user));
+          
+          _userData.assignAll(user);
+          _isLoggedIn.value = true;
+          return {'success': true, 'auto_logged_in': true, 'role': user['role']};
+        }
+        return {'success': true, 'auto_logged_in': false};
       }
       return {'success': false, 'message': response.data['message']};
     } on DioException catch (e) {
+      String message = 'Registration failed';
+      Map<String, dynamic>? errors;
+
+      if (e.response?.data != null) {
+        message = e.response?.data['message'] ?? message;
+        errors = e.response?.data['errors'];
+      }
+
       return {
         'success': false, 
-        'message': e.response?.data['message'] ?? 'Registration failed'
+        'message': message,
+        'errors': errors,
       };
     }
   }
