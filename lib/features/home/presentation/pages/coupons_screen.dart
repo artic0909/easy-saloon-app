@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:intl/intl.dart';
 
 class CouponsScreen extends StatefulWidget {
   const CouponsScreen({super.key});
@@ -35,6 +36,16 @@ class _CouponsScreenState extends State<CouponsScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       debugPrint("Error fetching coupons: $e");
+    }
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return 'No Expiry';
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      return dateStr;
     }
   }
 
@@ -161,7 +172,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                       if (coupon['expiry_date'] != null) ...[
                         SizedBox(height: 8.h),
                         Text(
-                          "Expires: ${coupon['expiry_date']}",
+                          "Expires: ${_formatDate(coupon['expiry_date'])}",
                           style: TextStyle(color: Colors.white38, fontSize: 10.sp),
                         ),
                       ],

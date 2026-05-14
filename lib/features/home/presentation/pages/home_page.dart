@@ -7,6 +7,7 @@ import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -122,6 +123,16 @@ class _HomePageState extends State<HomePage> {
         );
       }
     });
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return 'No Expiry';
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      return dateStr;
+    }
   }
 
   @override
@@ -307,6 +318,16 @@ class _HomePageState extends State<HomePage> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          if (coupon['expiry_date'] != null) ...[
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Expires: ${_formatDate(coupon['expiry_date'])}",
+                              style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: 9.sp,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                       Container(
