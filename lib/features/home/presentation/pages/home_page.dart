@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -5,6 +6,7 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
+import 'package:easysaloonapp/core/network/api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +19,60 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   final AuthService _authService = Get.find<AuthService>();
+  final ApiService _apiService = ApiService();
+
+  List<dynamic> _banners = [];
+  late PageController _pageController;
+  Timer? _timer;
+  int _activePage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    _fetchBanners();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _fetchBanners() async {
+    try {
+      final response = await _apiService.dio.get('/banners');
+      if (response.data['status'] == 'success') {
+        setState(() {
+          _banners = response.data['data'];
+        });
+        if (_banners.isNotEmpty) {
+          _startAutoScroll();
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching banners: $e");
+    }
+  }
+
+  void _startAutoScroll() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_pageController.hasClients && _banners.isNotEmpty) {
+        if (_activePage < _banners.length - 1) {
+          _activePage++;
+        } else {
+          _activePage = 0;
+        }
+        _pageController.animateToPage(
+          _activePage,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,79 +147,165 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHeroSection(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 450.h,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage('https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=1000&auto=format&fit=crop'),
-              fit: BoxFit.cover,
-            ),
+    if (_banners.isEmpty) {
+      return Container(
+        height: 450.h,
+        width: double.infinity,
+        color: AppColors.surface,
+        child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      );
+    }
+
+    return SizedBox(
+      height: 450.h,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (page) {
+              setState(() {
+                _activePage = page;
+              });
+            },
+            itemCount: _banners.length,
+            itemBuilder: (context, index) {
+              final banner = _banners[index];
+              return Stack(
+                children: [
+                  // Background Image
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(banner['image']),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  // Gradient Overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.2),
+                          Colors.black.withValues(alpha: 0.8),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Content
+                  Positioned(
+                    bottom: 60.h,
+                    left: 24.w,
+                    right: 24.w,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildStyledTitle(banner['title'] ?? ''),
+                        if (banner['subtitle'] != null && banner['subtitle'].toString().isNotEmpty) ...[
+                          SizedBox(height: 8.h),
+                          Text(
+                            banner['subtitle'].toString().toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: AppColors.primaryLight,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ),
-        Container(
-          height: 450.h,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withValues(alpha: 0.2),
-                Colors.black.withValues(alpha: 0.8),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 40.h,
-          left: 24.w,
-          right: 24.w,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(height: 1.1),
-                  children: const [
-                    TextSpan(text: "Bringing "),
-                    TextSpan(text: "Salon Expertise ", style: TextStyle(color: AppColors.primary)),
-                    TextSpan(text: "to Your Doorstep"),
-                  ],
+          // Page Indicators
+          Positioned(
+            bottom: 30.h,
+            left: 24.w,
+            child: Row(
+              children: List.generate(
+                _banners.length,
+                (index) => Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  width: _activePage == index ? 24 : 8,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    color: _activePage == index ? AppColors.primary : Colors.white24,
+                  ),
                 ),
               ),
-              SizedBox(height: 12.h),
-              Text(
-                "While Changing the Lives of Service Professionals",
-                style: TextStyle(color: Colors.white70, fontSize: 14.sp),
-              ),
-              SizedBox(height: 24.h),
-              Row(
-                children: [
-                  _buildHeroButton("Download App", Colors.white.withValues(alpha: 0.1), Colors.white),
-                  SizedBox(width: 12.w),
-                  _buildHeroButton("Register as Partner", AppColors.primary, AppColors.textOnPrimary),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildHeroButton(String text, Color bg, Color textCol) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(30),
-        border: bg == Colors.white.withValues(alpha: 0.1) ? Border.all(color: Colors.white24) : null,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: textCol, fontWeight: FontWeight.bold, fontSize: 12.sp),
+  Widget _buildStyledTitle(String title) {
+    // Replace | with \n for line breaks
+    final processedTitle = title.replaceAll('|', '\n');
+    
+    // Regex to find text between *asterisks*
+    final regex = RegExp(r'\*(.*?)\*');
+    final matches = regex.allMatches(processedTitle);
+    
+    if (matches.isEmpty) {
+      return Text(
+        processedTitle,
+        style: TextStyle(
+          fontSize: 32.sp,
+          fontFamily: 'Playfair Display',
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          height: 1.1,
+        ),
+      );
+    }
+
+    List<TextSpan> spans = [];
+    int lastMatchEnd = 0;
+
+    for (final match in matches) {
+      // Add text before the match
+      if (match.start > lastMatchEnd) {
+        spans.add(TextSpan(
+          text: processedTitle.substring(lastMatchEnd, match.start),
+          style: const TextStyle(color: Colors.white),
+        ));
+      }
+      
+      // Add the matched text (between asterisks) in gold color
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: const TextStyle(color: AppColors.primary),
+      ));
+      
+      lastMatchEnd = match.end;
+    }
+
+    // Add remaining text after the last match
+    if (lastMatchEnd < processedTitle.length) {
+      spans.add(TextSpan(
+        text: processedTitle.substring(lastMatchEnd),
+        style: const TextStyle(color: Colors.white),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 32.sp,
+          fontFamily: 'Playfair Display',
+          fontWeight: FontWeight.bold,
+          height: 1.1,
+        ),
+        children: spans,
       ),
     );
   }
