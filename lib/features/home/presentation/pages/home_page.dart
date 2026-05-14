@@ -1,37 +1,92 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
+import 'package:easysaloonapp/core/widgets/app_drawer.dart';
+import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _currentIndex = 0;
+  final AuthService _authService = Get.find<AuthService>();
+
+  @override
   Widget build(BuildContext context) {
+    final pages = [
+      _buildHomeContent(),
+      _buildPlaceholderContent("My Bookings"),
+      _buildPlaceholderContent("Packages"),
+      _buildPlaceholderContent("Services"),
+    ];
+
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeroSection(context),
-            SizedBox(height: 32.h),
-            _buildSectionHeader("Explore by Category"),
-            SizedBox(height: 16.h),
-            _buildCategoryList(),
-            SizedBox(height: 40.h),
-            _buildSectionHeader("Services we offer"),
-            _buildSubHeader("CURATED LUXURY EXPERIENCES FOR YOUR WELLBEING"),
-            SizedBox(height: 20.h),
-            _buildServicesGrid(),
-            SizedBox(height: 40.h),
-            _buildSectionHeader("Media Coverages"),
-            SizedBox(height: 20.h),
-            _buildMediaCoverages(),
-            SizedBox(height: 60.h),
-          ],
-        ),
+      drawer: const AppDrawer(),
+      body: pages[_currentIndex],
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          if (index == 4) {
+            _scaffoldKey.currentState?.openDrawer();
+          } else {
+            setState(() => _currentIndex = index);
+          }
+        },
       ),
-      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildPlaceholderContent(String title) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.construction, size: 64, color: AppColors.primary.withValues(alpha: 0.5)),
+          SizedBox(height: 16.h),
+          Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Playfair Display'),
+          ),
+          Text(
+            "Coming Soon",
+            style: TextStyle(color: AppColors.primary, fontSize: 14.sp),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeroSection(context),
+          SizedBox(height: 32.h),
+          _buildSectionHeader("Explore by Category"),
+          SizedBox(height: 16.h),
+          _buildCategoryList(),
+          SizedBox(height: 40.h),
+          _buildSectionHeader("Services we offer"),
+          _buildSubHeader("CURATED LUXURY EXPERIENCES FOR YOUR WELLBEING"),
+          SizedBox(height: 20.h),
+          _buildServicesGrid(),
+          SizedBox(height: 40.h),
+          _buildSectionHeader("Media Coverages"),
+          SizedBox(height: 20.h),
+          _buildMediaCoverages(),
+          SizedBox(height: 60.h),
+        ],
+      ),
     );
   }
 
@@ -55,8 +110,8 @@ class HomePage extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.black.withOpacity(0.8),
+                Colors.black.withValues(alpha: 0.2),
+                Colors.black.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -86,7 +141,7 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 24.h),
               Row(
                 children: [
-                  _buildHeroButton("Download App", Colors.white.withOpacity(0.1), Colors.white),
+                  _buildHeroButton("Download App", Colors.white.withValues(alpha: 0.1), Colors.white),
                   SizedBox(width: 12.w),
                   _buildHeroButton("Register as Partner", AppColors.primary, AppColors.textOnPrimary),
                 ],
@@ -104,7 +159,7 @@ class HomePage extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(30),
-        border: bg == Colors.white.withOpacity(0.1) ? Border.all(color: Colors.white24) : null,
+        border: bg == Colors.white.withValues(alpha: 0.1) ? Border.all(color: Colors.white24) : null,
       ),
       child: Text(
         text,
@@ -164,7 +219,7 @@ class HomePage extends StatelessWidget {
                     image: NetworkImage('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop'),
                     fit: BoxFit.cover,
                   ),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
                 ),
               ),
               SizedBox(height: 8.h),
@@ -205,7 +260,7 @@ class HomePage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
                 ),
               ),
               padding: const EdgeInsets.all(12),
@@ -268,21 +323,6 @@ class HomePage extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      backgroundColor: AppColors.background,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: Colors.grey,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), label: 'Bookings'),
-        BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_outlined), label: 'Offers'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-      ],
     );
   }
 }
