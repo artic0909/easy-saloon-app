@@ -22,38 +22,88 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
 
   List<dynamic> _banners = [];
+  List<dynamic> _coupons = [];
+  List<dynamic> _categories = [];
+  List<dynamic> _filteredCategories = [];
+  
   late PageController _pageController;
   Timer? _timer;
   int _activePage = 0;
+  bool _isGridView = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-    _fetchBanners();
+    _fetchAllData();
+    _searchController.addListener(_filterCategories);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _pageController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  void _fetchBanners() async {
+  void _fetchAllData() async {
+    await Future.wait([
+      _fetchBanners(),
+      _fetchCoupons(),
+      _fetchCategories(),
+    ]);
+  }
+
+  Future<void> _fetchBanners() async {
     try {
       final response = await _apiService.dio.get('/banners');
       if (response.data['status'] == 'success') {
         setState(() {
           _banners = response.data['data'];
         });
-        if (_banners.isNotEmpty) {
-          _startAutoScroll();
-        }
+        if (_banners.isNotEmpty) _startAutoScroll();
       }
     } catch (e) {
       debugPrint("Error fetching banners: $e");
     }
+  }
+
+  Future<void> _fetchCoupons() async {
+    try {
+      final response = await _apiService.dio.get('/coupons');
+      if (response.data['status'] == 'success') {
+        setState(() {
+          _coupons = response.data['data'];
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching coupons: $e");
+    }
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final response = await _apiService.dio.get('/categories');
+      if (response.data['status'] == 'success') {
+        setState(() {
+          _categories = response.data['data'];
+          _filteredCategories = _categories;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching categories: $e");
+    }
+  }
+
+  void _filterCategories() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredCategories = _categories.where((cat) {
+        return cat['name'].toString().toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   void _startAutoScroll() {
@@ -127,20 +177,265 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeroSection(context),
+          SizedBox(height: 24.h),
+          _buildSearchBar(),
           SizedBox(height: 32.h),
-          _buildSectionHeader("Explore by Category"),
-          SizedBox(height: 16.h),
-          _buildCategoryList(),
-          SizedBox(height: 40.h),
-          _buildSectionHeader("Services we offer"),
-          _buildSubHeader("CURATED LUXURY EXPERIENCES FOR YOUR WELLBEING"),
+          if (_coupons.isNotEmpty) ...[
+            _buildSectionHeader("Exclusive Offers"),
+            SizedBox(height: 16.h),
+            _buildCouponList(),
+            SizedBox(height: 40.h),
+          ],
+          _buildCategoryHeader(),
           SizedBox(height: 20.h),
-          _buildServicesGrid(),
-          SizedBox(height: 40.h),
-          _buildSectionHeader("Media Coverages"),
-          SizedBox(height: 20.h),
-          _buildMediaCoverages(),
+          _buildCategoryContent(),
           SizedBox(height: 60.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+        ),
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: "Search categories...",
+            hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCouponList() {
+    return SizedBox(
+      height: 140.h,
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        scrollDirection: Axis.horizontal,
+        itemCount: _coupons.length,
+        separatorBuilder: (_, __) => SizedBox(width: 16.w),
+        itemBuilder: (context, index) {
+          final coupon = _coupons[index];
+          return Container(
+            width: 300.w,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primaryDark, AppColors.primary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -20,
+                  top: -20,
+                  child: Icon(Icons.stars, size: 100, color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${coupon['discount_value']}${coupon['discount_type'] == 'percentage' ? '%' : ' OFF'}",
+                            style: TextStyle(
+                              color: AppColors.textOnPrimary,
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            coupon['name'] ?? 'Discount Coupon',
+                            style: TextStyle(
+                              color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          coupon['code'] ?? '',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Categories",
+            style: TextStyle(
+              fontSize: 22.sp,
+              fontFamily: 'Playfair Display',
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.grid_view, color: _isGridView ? AppColors.primary : Colors.white24),
+                onPressed: () => setState(() => _isGridView = true),
+              ),
+              IconButton(
+                icon: Icon(Icons.list, color: !_isGridView ? AppColors.primary : Colors.white24),
+                onPressed: () => setState(() => _isGridView = false),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryContent() {
+    if (_filteredCategories.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 40.h),
+          child: Text("No categories found", style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
+        ),
+      );
+    }
+
+    return _isGridView ? _buildCategoryGrid() : _buildCategoryList();
+  }
+
+  Widget _buildCategoryGrid() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1.1,
+        ),
+        itemCount: _filteredCategories.length,
+        itemBuilder: (context, index) {
+          final cat = _filteredCategories[index];
+          return _buildCategoryCard(cat);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryList() {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      itemCount: _filteredCategories.length,
+      separatorBuilder: (_, __) => SizedBox(height: 12.h),
+      itemBuilder: (context, index) {
+        final cat = _filteredCategories[index];
+        return _buildCategoryListItem(cat);
+      },
+    );
+  }
+
+  Widget _buildCategoryCard(dynamic cat) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        image: DecorationImage(
+          image: NetworkImage(cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400&auto=format&fit=crop'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+          ),
+        ),
+        padding: const EdgeInsets.all(12),
+        alignment: Alignment.bottomLeft,
+        child: Text(
+          cat['name'] ?? '',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryListItem(dynamic cat) {
+    return Container(
+      height: 80.h,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
+            child: Image.network(
+              cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop',
+              width: 80.h,
+              height: 80.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Text(
+              cat['name'] ?? '',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp),
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: AppColors.primary),
+          SizedBox(width: 16.w),
         ],
       ),
     );
@@ -172,7 +467,6 @@ class _HomePageState extends State<HomePage> {
               final banner = _banners[index];
               return Stack(
                 children: [
-                  // Background Image
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -182,7 +476,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // Gradient Overlay
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -195,7 +488,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // Content
                   Positioned(
                     bottom: 60.h,
                     left: 24.w,
@@ -223,7 +515,6 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-          // Page Indicators
           Positioned(
             bottom: 30.h,
             left: 24.w,
@@ -248,10 +539,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildStyledTitle(String title) {
-    // Replace | with \n for line breaks
     final processedTitle = title.replaceAll('|', '\n');
-    
-    // Regex to find text between *asterisks*
     final regex = RegExp(r'\*(.*?)\*');
     final matches = regex.allMatches(processedTitle);
     
@@ -272,24 +560,19 @@ class _HomePageState extends State<HomePage> {
     int lastMatchEnd = 0;
 
     for (final match in matches) {
-      // Add text before the match
       if (match.start > lastMatchEnd) {
         spans.add(TextSpan(
           text: processedTitle.substring(lastMatchEnd, match.start),
           style: const TextStyle(color: Colors.white),
         ));
       }
-      
-      // Add the matched text (between asterisks) in gold color
       spans.add(TextSpan(
         text: match.group(1),
         style: const TextStyle(color: AppColors.primary),
       ));
-      
       lastMatchEnd = match.end;
     }
 
-    // Add remaining text after the last match
     if (lastMatchEnd < processedTitle.length) {
       spans.add(TextSpan(
         text: processedTitle.substring(lastMatchEnd),
@@ -321,149 +604,6 @@ class _HomePageState extends State<HomePage> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-      ),
-    );
-  }
-
-  Widget _buildSubHeader(String text) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 10.sp,
-          letterSpacing: 1.2,
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryList() {
-    final categories = ["Hair Care", "Makeup", "Facial & Spa", "Men's Grooming"];
-    return SizedBox(
-      height: 120.h,
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => SizedBox(width: 16.w),
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              Container(
-                width: 70.w,
-                height: 70.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop'),
-                    fit: BoxFit.cover,
-                  ),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(categories[index], style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildServicesGrid() {
-    final services = ["hair cutting", "Premium Haircut", "Hair Coloring"];
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.8,
-        ),
-        itemCount: services.length,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: const DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=400&auto=format&fit=crop'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
-                ),
-              ),
-              padding: const EdgeInsets.all(12),
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                services[index],
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMediaCoverages() {
-    return SizedBox(
-      height: 200.h,
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        scrollDirection: Axis.horizontal,
-        itemCount: 3,
-        separatorBuilder: (_, __) => SizedBox(width: 16.w),
-        itemBuilder: (context, index) {
-          return Container(
-            width: 280.w,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(width: 20, height: 12, color: Colors.red),
-                    SizedBox(width: 8.w),
-                    Text("The Times of India", style: TextStyle(color: Colors.white54, fontSize: 10.sp)),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  "How Easy Saloon is redefining the grooming industry",
-                  maxLines: 2,
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.sp),
-                ),
-                const Spacer(),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=400&auto=format&fit=crop',
-                    height: 80.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
