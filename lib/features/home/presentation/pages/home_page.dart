@@ -172,26 +172,62 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeroSection(context),
-          SizedBox(height: 24.h),
-          _buildSearchBar(),
-          SizedBox(height: 32.h),
-          if (_coupons.isNotEmpty) ...[
-            _buildSectionHeader("Exclusive Offers"),
-            SizedBox(height: 16.h),
-            _buildCouponList(),
-            SizedBox(height: 40.h),
-          ],
-          _buildCategoryHeader(),
-          SizedBox(height: 20.h),
-          _buildCategoryContent(),
-          SizedBox(height: 60.h),
-        ],
-      ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeroSection(context),
+              SizedBox(height: 24.h),
+              _buildSearchBar(),
+              SizedBox(height: 32.h),
+              if (_coupons.isNotEmpty) ...[
+                _buildSectionHeader("Exclusive Offers"),
+                SizedBox(height: 16.h),
+                _buildCouponList(),
+                SizedBox(height: 40.h),
+              ],
+              _buildCategoryHeader(),
+              SizedBox(height: 20.h),
+              _buildCategoryContent(),
+              SizedBox(height: 60.h),
+            ],
+          ),
+        ),
+        // Floating Notification Icon
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 10,
+          right: 20,
+          child: GestureDetector(
+            onTap: () => Get.toNamed('/notifications'),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Stack(
+                children: [
+                  const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
+                  Positioned(
+                    right: 2,
+                    top: 2,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

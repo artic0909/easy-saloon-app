@@ -55,15 +55,23 @@ class AppDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 8.h),
               children: [
-                _buildDrawerItem(Icons.person_outline, "My Profile"),
-                _buildDrawerItem(Icons.grid_view_outlined, "Categories"),
-                _buildDrawerItem(Icons.content_cut, "Services"),
-                _buildDrawerItem(Icons.card_giftcard, "Packages"),
-                _buildDrawerItem(Icons.auto_awesome, "Make own Package"),
-                _buildDrawerItem(Icons.event_available, "My Bookings"),
+                _buildDrawerItem(Icons.person_outline, "My Profile", () => Get.back()),
+                _buildDrawerItem(Icons.notifications_outlined, "Notifications", () {
+                  Get.back();
+                  Get.toNamed('/notifications');
+                }),
+                _buildDrawerItem(Icons.grid_view_outlined, "Categories", () => Get.back()),
+                _buildDrawerItem(Icons.content_cut, "Services", () => Get.back()),
+                _buildDrawerItem(Icons.card_giftcard, "Packages", () => Get.back()),
+                _buildDrawerItem(Icons.auto_awesome, "Make own Package", () => Get.back()),
+                _buildDrawerItem(Icons.event_available, "My Bookings", () => Get.back()),
+                _buildDrawerItem(Icons.confirmation_number_outlined, "Coupons", () {
+                  Get.back();
+                  Get.toNamed('/coupons');
+                }),
                 const Divider(color: Colors.white10),
-                _buildDrawerItem(Icons.gavel, "Legal"),
-                _buildDrawerItem(Icons.help_outline, "Help"),
+                _buildDrawerItem(Icons.gavel, "Legal", () => Get.back()),
+                _buildDrawerItem(Icons.help_outline, "Help", () => Get.back()),
                 SizedBox(height: 20.h),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.redAccent),
@@ -78,14 +86,14 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title) {
+  Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon, color: AppColors.primary, size: 22),
       title: Text(
         title,
         style: TextStyle(color: Colors.white, fontSize: 14.sp),
       ),
-      onTap: () => Get.back(),
+      onTap: onTap,
     );
   }
 }
