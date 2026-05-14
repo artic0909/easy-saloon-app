@@ -39,12 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop'),
+                image: AssetImage('assets/login.avif'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          Container(color: Colors.black.withOpacity(0.6)),
+          Container(color: Colors.black.withValues(alpha: 0.6)),
           
           // Login Form
           Center(
@@ -57,9 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     padding: EdgeInsets.all(32.w),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

@@ -23,12 +23,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1000&auto=format&fit=crop'),
+                image: AssetImage('assets/register.avif'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          Container(color: Colors.black.withOpacity(0.6)),
+          Container(color: Colors.black.withValues(alpha: 0.6)),
           
           // Form
           Center(
@@ -41,9 +41,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Container(
                     padding: EdgeInsets.all(32.w),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
