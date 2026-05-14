@@ -85,9 +85,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _showSuccessDialog(String role) async {
-    await _requestLocationPermission();
-
+  void _showSuccessDialog(String role) {
+    // Show the dialog immediately
     Get.dialog(
       barrierDismissible: false,
       Dialog(
@@ -107,15 +106,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
 
-    // Auto-navigate after delay
-    await Future.delayed(const Duration(seconds: 3));
-    if (role == 'admin') {
-      Get.offAllNamed('/admin-dashboard');
-    } else if (role == 'staff') {
-      Get.offAllNamed('/staff-dashboard');
-    } else {
-      Get.offAllNamed('/home');
-    }
+    // Perform location request and redirection in the background
+    Future.delayed(const Duration(seconds: 3), () async {
+      await _requestLocationPermission();
+      
+      if (role == 'admin') {
+        Get.offAllNamed('/admin-dashboard');
+      } else if (role == 'staff') {
+        Get.offAllNamed('/staff-dashboard');
+      } else {
+        Get.offAllNamed('/home');
+      }
+    });
   }
 
   Future<void> _requestLocationPermission() async {
