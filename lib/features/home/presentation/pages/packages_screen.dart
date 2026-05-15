@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
+import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 
 class PackagesScreen extends StatefulWidget {
   const PackagesScreen({super.key});
@@ -13,6 +15,8 @@ class PackagesScreen extends StatefulWidget {
 
 class _PackagesScreenState extends State<PackagesScreen> {
   final ApiService _apiService = ApiService();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   List<dynamic> _packages = [];
   List<dynamic> _filteredPackages = [];
   bool _isLoading = true;
@@ -51,14 +55,11 @@ class _PackagesScreenState extends State<PackagesScreen> {
         _filteredPackages = _packages.where((pkg) {
           final pkgName = (pkg['name'] ?? "").toString().toLowerCase();
           final pkgDetails = (pkg['details'] ?? "").toString().toLowerCase();
-          
-          // Search in items/services too
           final items = pkg['items'] as List<dynamic>? ?? [];
           final hasService = items.any((item) {
             final serviceName = (item['service']?['name'] ?? "").toString().toLowerCase();
             return serviceName.contains(lowQuery);
           });
-
           return pkgName.contains(lowQuery) || pkgDetails.contains(lowQuery) || hasService;
         }).toList();
       }
@@ -68,7 +69,9 @@ class _PackagesScreenState extends State<PackagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -77,8 +80,8 @@ class _PackagesScreenState extends State<PackagesScreen> {
           style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20.sp, color: Colors.white),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Get.back(),
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
       ),
       body: Column(
@@ -92,6 +95,20 @@ class _PackagesScreenState extends State<PackagesScreen> {
                     : _buildPackagesList(),
           ),
         ],
+      ),
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 2,
+        onTap: (index) {
+          if (index == 4) {
+            _scaffoldKey.currentState?.openDrawer();
+          } else if (index == 0) {
+            Get.offAllNamed('/home');
+          } else if (index == 1) {
+            // Bookings
+          } else if (index == 3) {
+            Get.offNamed('/services');
+          }
+        },
       ),
     );
   }

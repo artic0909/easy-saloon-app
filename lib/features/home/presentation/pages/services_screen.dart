@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
+import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -13,6 +15,8 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   final ApiService _apiService = ApiService();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   List<dynamic> _services = [];
   List<dynamic> _categories = [];
   List<dynamic> _allSubcategories = [];
@@ -67,13 +71,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
     if (_selectedCategoryIds.isEmpty) {
       _filteredSubcategories = [];
     } else {
-      // Show subcategories that belong to ANY of the selected categories
-      // Use toString() to handle any type mismatches (int vs String)
       _filteredSubcategories = _allSubcategories.where((sub) {
         return _selectedCategoryIds.map((id) => id.toString()).contains(sub['category_id'].toString());
       }).toList();
     }
-    debugPrint("Filtered subcategories count: ${_filteredSubcategories.length}");
   }
 
   Future<void> _fetchServices() async {
@@ -111,7 +112,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -120,8 +123,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
           style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20.sp, color: Colors.white),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Get.back(),
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
         actions: [
           IconButton(
@@ -141,6 +144,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     : _buildServicesList(),
           ),
         ],
+      ),
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 3,
+        onTap: (index) {
+          if (index == 4) {
+            _scaffoldKey.currentState?.openDrawer();
+          } else if (index == 0) {
+            Get.offAllNamed('/home');
+          } else if (index == 1) {
+            // Bookings (not implemented yet)
+          } else if (index == 2) {
+            Get.offNamed('/packages');
+          }
+        },
       ),
     );
   }
@@ -305,11 +322,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   ),
                   SizedBox(height: 32.h),
                   
-                  // Category Header
                   _buildFilterHeader("CATEGORIES"),
                   SizedBox(height: 16.h),
                   
-                  // Categories List (Multi Select)
                   Column(
                     children: _categories.map((cat) {
                       final isSelected = _selectedCategoryIds.map((id) => id.toString()).contains(cat['id'].toString());
@@ -320,7 +335,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
                           setModalState(() {
                             if (isSelected) {
                               _selectedCategoryIds.removeWhere((id) => id.toString() == cat['id'].toString());
-                              // Clean up subcategories that no longer have a parent
                               _selectedSubCategoryIds.removeWhere((subId) {
                                 final sub = _allSubcategories.firstWhere((s) => s['id'].toString() == subId.toString(), orElse: () => null);
                                 return sub != null && sub['category_id'].toString() == cat['id'].toString();
@@ -335,7 +349,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     }).toList(),
                   ),
 
-                  // Sub Category Section (Multi Select)
                   if (_filteredSubcategories.isNotEmpty) ...[
                     SizedBox(height: 32.h),
                     _buildFilterHeader("SUB CATEGORIES"),
@@ -360,7 +373,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
                   SizedBox(height: 32.h),
 
-                  // Price Range
                   _buildFilterHeader("MAX PRICE"),
                   SizedBox(height: 16.h),
                   SliderTheme(
