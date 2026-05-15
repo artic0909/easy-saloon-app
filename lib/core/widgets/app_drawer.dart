@@ -65,7 +65,10 @@ class AppDrawer extends StatelessWidget {
                   Get.back();
                   Get.toNamed('/services');
                 }),
-                _buildDrawerItem(Icons.card_giftcard, "Packages", () => Get.back()),
+                _buildDrawerItem(Icons.card_giftcard, "Packages", () {
+                  Get.back();
+                  Get.toNamed('/packages');
+                }),
                 _buildDrawerItem(Icons.auto_awesome, "Make own Package", () => Get.back()),
                 _buildDrawerItem(Icons.event_available, "My Bookings", () => Get.back()),
                 _buildDrawerItem(Icons.confirmation_number_outlined, "Coupons", () {

@@ -156,6 +156,8 @@ class _HomePageState extends State<HomePage> {
             _scaffoldKey.currentState?.openDrawer();
           } else if (index == 3) {
             Get.toNamed('/services');
+          } else if (index == 2) {
+            Get.toNamed('/packages');
           } else {
             setState(() => _currentIndex = index);
           }
