@@ -61,7 +61,10 @@ class AppDrawer extends StatelessWidget {
                   Get.toNamed('/notifications');
                 }),
                 _buildDrawerItem(Icons.grid_view_outlined, "Categories", () => Get.back()),
-                _buildDrawerItem(Icons.content_cut, "Services", () => Get.back()),
+                _buildDrawerItem(Icons.content_cut, "Services", () {
+                  Get.back();
+                  Get.toNamed('/services');
+                }),
                 _buildDrawerItem(Icons.card_giftcard, "Packages", () => Get.back()),
                 _buildDrawerItem(Icons.auto_awesome, "Make own Package", () => Get.back()),
                 _buildDrawerItem(Icons.event_available, "My Bookings", () => Get.back()),

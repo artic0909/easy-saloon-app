@@ -154,6 +154,8 @@ class _HomePageState extends State<HomePage> {
         onTap: (index) {
           if (index == 4) {
             _scaffoldKey.currentState?.openDrawer();
+          } else if (index == 3) {
+            Get.toNamed('/services');
           } else {
             setState(() => _currentIndex = index);
           }
@@ -438,62 +440,68 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCategoryCard(dynamic cat) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(
-          image: NetworkImage(cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400&auto=format&fit=crop'),
-          fit: BoxFit.cover,
-        ),
-      ),
+    return GestureDetector(
+      onTap: () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+          image: DecorationImage(
+            image: NetworkImage(cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400&auto=format&fit=crop'),
+            fit: BoxFit.cover,
           ),
         ),
-        padding: const EdgeInsets.all(12),
-        alignment: Alignment.bottomLeft,
-        child: Text(
-          cat['name'] ?? '',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+            ),
+          ),
+          padding: const EdgeInsets.all(12),
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            cat['name'] ?? '',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCategoryListItem(dynamic cat) {
-    return Container(
-      height: 80.h,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
-            child: Image.network(
-              cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop',
-              width: 80.h,
-              height: 80.h,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
+      child: Container(
+        height: 80.h,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
+              child: Image.network(
+                cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop',
+                width: 80.h,
+                height: 80.h,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Text(
-              cat['name'] ?? '',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                cat['name'] ?? '',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp),
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: AppColors.primary),
-          SizedBox(width: 16.w),
-        ],
+            const Icon(Icons.chevron_right, color: AppColors.primary),
+            SizedBox(width: 16.w),
+          ],
+        ),
       ),
     );
   }
