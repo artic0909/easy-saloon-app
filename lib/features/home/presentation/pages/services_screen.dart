@@ -20,17 +20,18 @@ class _ServicesScreenState extends State<ServicesScreen> {
   
   bool _isLoading = true;
   String _searchQuery = "";
-  dynamic _selectedCategoryId;
-  dynamic _selectedSubCategoryId;
-  double _maxPrice = 10000;
-  double _currentPriceRange = 10000;
+  List<dynamic> _selectedCategoryIds = [];
+  List<dynamic> _selectedSubCategoryIds = [];
+  double _maxPrice = 11000;
+  double _currentPriceRange = 11000;
   String _sortBy = "newest";
 
   @override
   void initState() {
     super.initState();
     if (Get.arguments != null && Get.arguments is Map) {
-      _selectedCategoryId = Get.arguments['category_id'];
+      final catId = Get.arguments['category_id'];
+      if (catId != null) _selectedCategoryIds = [catId];
     }
     _fetchInitialData();
   }
@@ -49,13 +50,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
         setState(() {
           _categories = response.data['data']['categories'] ?? [];
           _allSubcategories = response.data['data']['subcategories'] ?? [];
-          double apiMaxPrice = double.tryParse(response.data['data']['max_price'].toString()) ?? 10000;
-          _maxPrice = apiMaxPrice > 0 ? apiMaxPrice : 10000;
+          _maxPrice = double.tryParse(response.data['data']['max_price'].toString()) ?? 11000;
           if (_currentPriceRange >= 10000) _currentPriceRange = _maxPrice;
           
-          if (_selectedCategoryId != null) {
-            _updateFilteredSubcategories(_selectedCategoryId);
-          }
+          _updateFilteredSubcategories();
         });
       }
     } catch (e) {
@@ -63,11 +61,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
     }
   }
 
-  void _updateFilteredSubcategories(dynamic categoryId) {
-    if (categoryId == null) {
+  void _updateFilteredSubcategories() {
+    if (_selectedCategoryIds.isEmpty) {
       _filteredSubcategories = [];
     } else {
-      _filteredSubcategories = _allSubcategories.where((sub) => sub['category_id'] == categoryId).toList();
+      // Show subcategories that belong to ANY of the selected categories
+      _filteredSubcategories = _allSubcategories.where((sub) {
+        return _selectedCategoryIds.contains(sub['category_id']);
+      }).toList();
     }
   }
 
@@ -81,8 +82,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
         'max_price': _currentPriceRange,
       };
       
-      if (_selectedCategoryId != null) params['category_id'] = _selectedCategoryId;
-      if (_selectedSubCategoryId != null) params['subcategory_id'] = _selectedSubCategoryId;
+      if (_selectedCategoryIds.isNotEmpty) {
+        params['category_id'] = _selectedCategoryIds.join(',');
+      }
+      if (_selectedSubCategoryIds.isNotEmpty) {
+        params['subcategory_id'] = _selectedSubCategoryIds.join(',');
+      }
 
       final response = await _apiService.dio.get('/services', queryParameters: params);
       if (response.data['status'] == 'success') {
@@ -278,8 +283,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            _selectedCategoryId = null;
-                            _selectedSubCategoryId = null;
+                            _selectedCategoryIds = [];
+                            _selectedSubCategoryIds = [];
                             _filteredSubcategories = [];
                             _currentPriceRange = _maxPrice;
                             _sortBy = "newest";
@@ -300,42 +305,50 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   _buildFilterHeader("CATEGORIES"),
                   SizedBox(height: 16.h),
                   
-                  // Categories List
+                  // Categories List (Multi Select)
                   Column(
                     children: _categories.map((cat) {
-                      final isSelected = _selectedCategoryId == cat['id'];
+                      final isSelected = _selectedCategoryIds.contains(cat['id']);
                       return _buildFilterItem(
                         cat['name'] ?? '',
                         isSelected,
                         () {
                           setModalState(() {
                             if (isSelected) {
-                              _selectedCategoryId = null;
-                              _selectedSubCategoryId = null;
-                              _filteredSubcategories = [];
+                              _selectedCategoryIds.remove(cat['id']);
+                              // Clean up subcategories that no longer have a parent
+                              _selectedSubCategoryIds.removeWhere((subId) {
+                                final sub = _allSubcategories.firstWhere((s) => s['id'] == subId, orElse: () => null);
+                                return sub != null && sub['category_id'] == cat['id'];
+                              });
                             } else {
-                              _selectedCategoryId = cat['id'];
-                              _selectedSubCategoryId = null;
-                              _updateFilteredSubcategories(cat['id']);
+                              _selectedCategoryIds.add(cat['id']);
                             }
+                            _updateFilteredSubcategories();
                           });
                         },
                       );
                     }).toList(),
                   ),
 
-                  // Sub Category Section (Only if category has subcategories)
-                  if (_selectedCategoryId != null && _filteredSubcategories.isNotEmpty) ...[
+                  // Sub Category Section (Multi Select)
+                  if (_filteredSubcategories.isNotEmpty) ...[
                     SizedBox(height: 32.h),
                     _buildFilterHeader("SUB CATEGORIES"),
                     SizedBox(height: 16.h),
                     Column(
                       children: _filteredSubcategories.map((sub) {
-                        final isSelected = _selectedSubCategoryId == sub['id'];
+                        final isSelected = _selectedSubCategoryIds.contains(sub['id']);
                         return _buildFilterItem(
                           sub['name'] ?? '',
                           isSelected,
-                          () => setModalState(() => _selectedSubCategoryId = isSelected ? null : sub['id']),
+                          () => setModalState(() {
+                            if (isSelected) {
+                              _selectedSubCategoryIds.remove(sub['id']);
+                            } else {
+                              _selectedSubCategoryIds.add(sub['id']);
+                            }
+                          }),
                         );
                       }).toList(),
                     ),
