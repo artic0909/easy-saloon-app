@@ -31,7 +31,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
     super.initState();
     if (Get.arguments != null && Get.arguments is Map) {
       final catId = Get.arguments['category_id'];
-      if (catId != null) _selectedCategoryIds = [catId];
+      if (catId != null) {
+        _selectedCategoryIds = [catId];
+      }
     }
     _fetchInitialData();
   }
@@ -66,10 +68,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
       _filteredSubcategories = [];
     } else {
       // Show subcategories that belong to ANY of the selected categories
+      // Use toString() to handle any type mismatches (int vs String)
       _filteredSubcategories = _allSubcategories.where((sub) {
-        return _selectedCategoryIds.contains(sub['category_id']);
+        return _selectedCategoryIds.map((id) => id.toString()).contains(sub['category_id'].toString());
       }).toList();
     }
+    debugPrint("Filtered subcategories count: ${_filteredSubcategories.length}");
   }
 
   Future<void> _fetchServices() async {
@@ -308,18 +312,18 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   // Categories List (Multi Select)
                   Column(
                     children: _categories.map((cat) {
-                      final isSelected = _selectedCategoryIds.contains(cat['id']);
+                      final isSelected = _selectedCategoryIds.map((id) => id.toString()).contains(cat['id'].toString());
                       return _buildFilterItem(
                         cat['name'] ?? '',
                         isSelected,
                         () {
                           setModalState(() {
                             if (isSelected) {
-                              _selectedCategoryIds.remove(cat['id']);
+                              _selectedCategoryIds.removeWhere((id) => id.toString() == cat['id'].toString());
                               // Clean up subcategories that no longer have a parent
                               _selectedSubCategoryIds.removeWhere((subId) {
-                                final sub = _allSubcategories.firstWhere((s) => s['id'] == subId, orElse: () => null);
-                                return sub != null && sub['category_id'] == cat['id'];
+                                final sub = _allSubcategories.firstWhere((s) => s['id'].toString() == subId.toString(), orElse: () => null);
+                                return sub != null && sub['category_id'].toString() == cat['id'].toString();
                               });
                             } else {
                               _selectedCategoryIds.add(cat['id']);
@@ -338,13 +342,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     SizedBox(height: 16.h),
                     Column(
                       children: _filteredSubcategories.map((sub) {
-                        final isSelected = _selectedSubCategoryIds.contains(sub['id']);
+                        final isSelected = _selectedSubCategoryIds.map((id) => id.toString()).contains(sub['id'].toString());
                         return _buildFilterItem(
                           sub['name'] ?? '',
                           isSelected,
                           () => setModalState(() {
                             if (isSelected) {
-                              _selectedSubCategoryIds.remove(sub['id']);
+                              _selectedSubCategoryIds.removeWhere((id) => id.toString() == sub['id'].toString());
                             } else {
                               _selectedSubCategoryIds.add(sub['id']);
                             }
