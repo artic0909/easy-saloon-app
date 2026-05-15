@@ -14,7 +14,9 @@ class PackagesScreen extends StatefulWidget {
 class _PackagesScreenState extends State<PackagesScreen> {
   final ApiService _apiService = ApiService();
   List<dynamic> _packages = [];
+  List<dynamic> _filteredPackages = [];
   bool _isLoading = true;
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
       if (response.data['status'] == 'success') {
         setState(() {
           _packages = response.data['data'];
+          _filteredPackages = _packages;
           _isLoading = false;
         });
       }
@@ -36,6 +39,30 @@ class _PackagesScreenState extends State<PackagesScreen> {
       setState(() => _isLoading = false);
       debugPrint("Error fetching packages: $e");
     }
+  }
+
+  void _filterPackages(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredPackages = _packages;
+      } else {
+        final lowQuery = query.toLowerCase();
+        _filteredPackages = _packages.where((pkg) {
+          final pkgName = (pkg['name'] ?? "").toString().toLowerCase();
+          final pkgDetails = (pkg['details'] ?? "").toString().toLowerCase();
+          
+          // Search in items/services too
+          final items = pkg['items'] as List<dynamic>? ?? [];
+          final hasService = items.any((item) {
+            final serviceName = (item['service']?['name'] ?? "").toString().toLowerCase();
+            return serviceName.contains(lowQuery);
+          });
+
+          return pkgName.contains(lowQuery) || pkgDetails.contains(lowQuery) || hasService;
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -46,7 +73,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          "Service Packages",
+          "All Packages",
           style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20.sp, color: Colors.white),
         ),
         leading: IconButton(
@@ -54,27 +81,61 @@ class _PackagesScreenState extends State<PackagesScreen> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : _packages.isEmpty
-              ? _buildEmptyState()
-              : _buildPackagesList(),
+      body: Column(
+        children: [
+          _buildSearchField(),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                : _filteredPackages.isEmpty
+                    ? _buildEmptyState()
+                    : _buildPackagesList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+        ),
+        child: TextField(
+          style: const TextStyle(color: Colors.white),
+          onChanged: _filterPackages,
+          decoration: InputDecoration(
+            hintText: "Search packages or services...",
+            hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildPackagesList() {
     return ListView.separated(
-      padding: EdgeInsets.all(24.w),
-      itemCount: _packages.length,
+      padding: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 24.h),
+      itemCount: _filteredPackages.length,
       separatorBuilder: (_, __) => SizedBox(height: 24.h),
       itemBuilder: (context, index) {
-        final package = _packages[index];
+        final package = _filteredPackages[index];
         return _buildPackageCard(package);
       },
     );
   }
 
   Widget _buildPackageCard(dynamic package) {
+    final salePrice = package['sale_price'] ?? package['price'] ?? '0';
+    final originalPrice = package['original_price'];
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -114,16 +175,30 @@ class _PackagesScreenState extends State<PackagesScreen> {
                 Positioned(
                   bottom: 12.h,
                   left: 12.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      "₹${package['price']}",
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16.sp),
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (originalPrice != null && originalPrice != salePrice)
+                        Text(
+                          "₹$originalPrice",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12.sp,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "₹$salePrice",
+                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16.sp),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -140,7 +215,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  package['description'] ?? 'Exclusive service bundle',
+                  package['details'] ?? package['description'] ?? 'Exclusive service bundle',
                   style: TextStyle(color: Colors.white38, fontSize: 12.sp),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
