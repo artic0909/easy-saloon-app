@@ -194,8 +194,6 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeroSection(context),
-              SizedBox(height: 24.h),
-              _buildSearchBar(),
               SizedBox(height: 32.h),
               if (_coupons.isNotEmpty) ...[
                 _buildSectionHeader("Exclusive Offers"),
@@ -203,6 +201,8 @@ class _HomePageState extends State<HomePage> {
                 _buildCouponList(),
                 SizedBox(height: 40.h),
               ],
+              _buildSearchBar(),
+              SizedBox(height: 32.h),
               _buildCategoryHeader(),
               SizedBox(height: 20.h),
               _buildCategoryContent(),
