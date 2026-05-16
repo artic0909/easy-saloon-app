@@ -16,7 +16,9 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
   final ApiService _apiService = ApiService();
   bool _isLoading = true;
   List<dynamic> _categories = [];
+  List<dynamic> _filteredCategories = [];
   final List<dynamic> _selectedServices = [];
+  String _searchQuery = "";
   
   // Booking selections
   String _serviceLocation = 'home';
@@ -36,6 +38,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       if (response.data['status'] == 'success') {
         setState(() {
           _categories = response.data['data'];
+          _filteredCategories = _categories;
           _isLoading = false;
         });
       }
@@ -43,6 +46,27 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load data", backgroundColor: Colors.red.withOpacity(0.7));
     }
+  }
+
+  void _filterServices(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredCategories = _categories;
+      } else {
+        final lowQuery = query.toLowerCase();
+        _filteredCategories = _categories.map((cat) {
+          final services = (cat['services'] as List<dynamic>? ?? []).where((s) {
+            final name = (s['name'] ?? '').toString().toLowerCase();
+            return name.contains(lowQuery);
+          }).toList();
+          return {
+            ...cat,
+            'services': services,
+          };
+        }).where((cat) => (cat['services'] as List).isNotEmpty).toList();
+      }
+    });
   }
 
   double get _totalPrice {
@@ -120,12 +144,13 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : Column(
               children: [
+                _buildSearchField(),
                 Expanded(
                   child: ListView.builder(
-                    padding: EdgeInsets.all(20.w),
-                    itemCount: _categories.length,
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    itemCount: _filteredCategories.length,
                     itemBuilder: (context, index) {
-                      final category = _categories[index];
+                      final category = _filteredCategories[index];
                       final services = category['services'] as List<dynamic>? ?? [];
                       if (services.isEmpty) return const SizedBox.shrink();
 
@@ -149,6 +174,30 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
                 _buildSummaryAndBookingBar(),
               ],
             ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Padding(
+      padding: EdgeInsets.all(20.w),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(15.r),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
+        ),
+        child: TextField(
+          style: const TextStyle(color: Colors.white),
+          onChanged: _filterServices,
+          decoration: InputDecoration(
+            hintText: "Search services...",
+            hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 15.h),
+          ),
+        ),
+      ),
     );
   }
 
@@ -272,7 +321,54 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
                 _buildModalEquipmentSection(setModalState),
 
                 SizedBox(height: 25.h),
-                Text("SELECT DATE", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("SELECT DATE", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                    InkWell(
+                      onTap: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 90)),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: const ColorScheme.dark(
+                                  primary: AppColors.primary,
+                                  onPrimary: Colors.black,
+                                  surface: Color(0xFF1A1512),
+                                  onSurface: Colors.white,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (picked != null && picked != _selectedDate) {
+                          setModalState(() => _selectedDate = picked);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.calendar_today, color: AppColors.primary, size: 10.sp),
+                            SizedBox(width: 5.w),
+                            Text(DateFormat('yyyy-MM-dd').format(_selectedDate), style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 12.h),
                 Row(
                   children: [
