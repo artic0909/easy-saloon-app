@@ -100,16 +100,16 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           children: [
             _buildHeader(),
             Padding(
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(20.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildAboutSection(),
-                  SizedBox(height: 32.h),
+                  SizedBox(height: 20.h),
                   _buildIncludedSection(),
-                  SizedBox(height: 40.h),
+                  SizedBox(height: 30.h),
                   _buildBookingWidget(),
-                  SizedBox(height: 40.h),
+                  SizedBox(height: 30.h),
                 ],
               ),
             ),
@@ -127,12 +127,12 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           child: Image.network(
             _service['image'] ?? 'https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=600&auto=format&fit=crop',
             width: double.infinity,
-            height: 350.h,
+            height: 320.h,
             fit: BoxFit.cover,
           ),
         ),
         Container(
-          height: 350.h,
+          height: 320.h,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(40.r)),
             gradient: LinearGradient(
@@ -277,7 +277,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
   Widget _buildBookingWidget() {
     return Container(
-      padding: EdgeInsets.all(30.w),
+      padding: EdgeInsets.all(25.w),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1512), // Dark Brown as in screenshot
         borderRadius: BorderRadius.circular(40.r),
@@ -303,7 +303,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   Text("ESTIMATED PRICE", style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
                   SizedBox(height: 4.h),
                   Text("₹${_service['sale_price']}", style: TextStyle(color: Colors.white, fontSize: 28.sp, fontWeight: FontWeight.w900)),
-                  if (_service['original_price'] != null && _service['original_price'] > _service['sale_price'])
+                  if (_service['original_price'] != null && 
+                      (double.tryParse(_service['original_price'].toString()) ?? 0) > 
+                      (double.tryParse(_service['sale_price'].toString()) ?? 0))
                     Text("₹${_service['original_price']}", style: TextStyle(color: Colors.white24, fontSize: 12.sp, decoration: TextDecoration.lineThrough)),
                 ],
               ),
@@ -377,7 +379,48 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("SELECT DATE & SLOT", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
-              Text(DateFormat('yyyy-MM-dd').format(_selectedDate), style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.w900)),
+              InkWell(
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 90)),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.dark(
+                            primary: AppColors.primary,
+                            onPrimary: Colors.black,
+                            surface: Color(0xFF1A1512),
+                            onSurface: Colors.white,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (picked != null && picked != _selectedDate) {
+                    setState(() => _selectedDate = picked);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.calendar_today, color: AppColors.primary, size: 10.sp),
+                      SizedBox(width: 6.w),
+                      Text(DateFormat('yyyy-MM-dd').format(_selectedDate), style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.w900)),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           SizedBox(height: 16.h),
@@ -404,18 +447,18 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           // Book Now Button
           SizedBox(
             width: double.infinity,
-            height: 60.h,
+            height: 55.h,
             child: ElevatedButton(
               onPressed: _handleBooking,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-                elevation: 10,
-                shadowColor: AppColors.primary.withOpacity(0.3),
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.r)),
+                elevation: 0,
               ),
               child: Text(
                 "Book Now",
-                style: TextStyle(color: Colors.black, fontSize: 18.sp, fontWeight: FontWeight.w900),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w900),
               ),
             ),
           ),
