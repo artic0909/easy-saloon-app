@@ -169,7 +169,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
         ),
         child: TextField(
           style: const TextStyle(color: Colors.white),
@@ -202,66 +202,69 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Widget _buildServiceCard(dynamic service) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(15)),
-            child: Image.network(
-              service['image'] ?? 'https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=200&auto=format&fit=crop',
-              width: 100.w,
-              height: 100.w,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    service['name'] ?? '',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    service['short_description'] ?? 'Premium salon service',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.white38, fontSize: 11.sp),
-                  ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "₹${service['sale_price']}",
-                        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16.sp),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          "Book Now",
-                          style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+    return InkWell(
+      onTap: () => Get.toNamed('/service-detail', arguments: {'id': service['id']}),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(15)),
+              child: Image.network(
+                service['image'] ?? 'https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=200&auto=format&fit=crop',
+                width: 100.w,
+                height: 100.w,
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      service['name'] ?? '',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      service['short_description'] ?? 'Premium salon service',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.white38, fontSize: 11.sp),
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "₹${service['sale_price']}",
+                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16.sp),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            "Book Now",
+                            style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -380,7 +383,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       activeTrackColor: AppColors.primary,
                       inactiveTrackColor: Colors.white10,
                       thumbColor: AppColors.primary,
-                      overlayColor: AppColors.primary.withValues(alpha: 0.1),
+                      overlayColor: AppColors.primary.withOpacity(0.1),
                     ),
                     child: Slider(
                       value: _currentPriceRange.clamp(0, _maxPrice),
