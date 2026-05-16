@@ -93,38 +93,22 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
     });
   }
 
-  Future<void> _handleBooking() async {
+  void _handleBooking() {
     if (_selectedServices.isEmpty) {
       Get.snackbar("Error", "Please select at least one service", backgroundColor: Colors.red.withOpacity(0.7));
       return;
     }
 
-    try {
-      final response = await _apiService.dio.post('/bookings/custom-package', data: {
-        'service_ids': _selectedServices.map((s) => s['id']).toList(),
-        'type': _serviceLocation,
+    Get.toNamed('/checkout', arguments: {
+      'type': 'custom',
+      'itemData': _selectedServices,
+      'bookingDetails': {
+        'location': _serviceLocation,
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'slot': _selectedSlot,
         'equipment': _selectedEquipments,
-      });
-
-      if (response.data['status'] == 'success') {
-        Get.defaultDialog(
-          title: "Success!",
-          middleText: "Custom package booked successfully.",
-          backgroundColor: AppColors.surface,
-          titleStyle: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-          middleTextStyle: const TextStyle(color: Colors.white70),
-          confirm: ElevatedButton(
-            onPressed: () => Get.offAllNamed('/home'),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            child: const Text("Go Home", style: TextStyle(color: Colors.black)),
-          ),
-        );
       }
-    } catch (e) {
-      Get.snackbar("Booking Failed", "Something went wrong.", backgroundColor: Colors.red.withOpacity(0.7));
-    }
+    });
   }
 
   @override

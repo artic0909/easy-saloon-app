@@ -46,34 +46,17 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     }
   }
 
-  Future<void> _handleBooking() async {
-    try {
-      final response = await _apiService.dio.post('/bookings/package', data: {
-        'package_id': _package['id'],
-        'type': _serviceLocation,
+  void _handleBooking() {
+    Get.toNamed('/checkout', arguments: {
+      'type': 'package',
+      'itemData': _package,
+      'bookingDetails': {
+        'location': _serviceLocation,
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'slot': _selectedSlot,
         'equipment': _selectedEquipments,
-      });
-
-      if (response.data['status'] == 'success') {
-        Get.defaultDialog(
-          title: "Success!",
-          middleText: "Package booked successfully.",
-          backgroundColor: AppColors.surface,
-          titleStyle: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-          middleTextStyle: const TextStyle(color: Colors.white70),
-          confirm: ElevatedButton(
-            onPressed: () => Get.offAllNamed('/home'),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            child: const Text("Go Home", style: TextStyle(color: Colors.black)),
-          ),
-        );
       }
-    } catch (e) {
-      Get.snackbar("Booking Failed", "Something went wrong. Please try again.", 
-          backgroundColor: Colors.red.withOpacity(0.7), colorText: Colors.white);
-    }
+    });
   }
 
   @override
