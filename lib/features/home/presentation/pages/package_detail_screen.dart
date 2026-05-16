@@ -21,6 +21,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   String _serviceLocation = 'home';
   DateTime _selectedDate = DateTime.now();
   String _selectedSlot = 'Morning';
+  List<String> _selectedEquipments = [];
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
         'type': _serviceLocation,
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'slot': _selectedSlot,
+        'equipment': _selectedEquipments,
       });
 
       if (response.data['status'] == 'success') {
@@ -324,6 +326,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
             ],
           ),
 
+          // Equipment Selection
+          _buildPackageEquipmentSection(),
+
           SizedBox(height: 30.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -458,6 +463,69 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPackageEquipmentSection() {
+    final List<dynamic> items = _package['items'] ?? [];
+    final itemsWithEquipment = items.where((item) => 
+      item['service'] != null && 
+      item['service']['sub_category'] != null && 
+      item['service']['sub_category']['equipment'] != null && 
+      (item['service']['sub_category']['equipment'] as List).isNotEmpty
+    ).toList();
+
+    if (itemsWithEquipment.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 30.h),
+        Text("REQUIRED EQUIPMENTS (OPTIONAL)", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
+        ...itemsWithEquipment.map((item) {
+          final service = item['service'];
+          final List<dynamic> equipment = service['sub_category']['equipment'];
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16.h),
+              Text("| ${service['name']?.toString().toUpperCase()}", style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10.h),
+              Wrap(
+                spacing: 10.w,
+                runSpacing: 10.h,
+                children: equipment.map((eq) {
+                  final isSelected = _selectedEquipments.contains(eq['name']);
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        if (isSelected) {
+                          _selectedEquipments.remove(eq['name']);
+                        } else {
+                          _selectedEquipments.add(eq['name']);
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1)),
+                      ),
+                      child: Text(
+                        eq['name'],
+                        style: TextStyle(color: isSelected ? Colors.black : Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          );
+        }).toList(),
+      ],
     );
   }
 
