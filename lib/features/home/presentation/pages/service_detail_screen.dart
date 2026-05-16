@@ -223,7 +223,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     final List<dynamic> included = _service['what_included'] ?? ["Professional Consultation", "Certified Professional"];
     
     return Container(
-      padding: EdgeInsets.all(24.w),
+      padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(30.r),
@@ -236,13 +236,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             "What's Included?",
             style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 2.h),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              mainAxisExtent: 40.h,
+              mainAxisExtent: 32.h,
               crossAxisSpacing: 10.w,
             ),
             itemCount: included.length,
