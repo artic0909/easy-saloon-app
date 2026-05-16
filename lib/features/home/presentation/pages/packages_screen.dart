@@ -120,7 +120,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
         ),
         child: TextField(
           style: const TextStyle(color: Colors.white),
@@ -153,117 +153,121 @@ class _PackagesScreenState extends State<PackagesScreen> {
     final salePrice = package['sale_price'] ?? package['price'] ?? '0';
     final originalPrice = package['original_price'];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
-            child: Stack(
-              children: [
-                Image.network(
-                  package['image'] ?? 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=600&auto=format&fit=crop',
-                  height: 180.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  height: 180.h,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
+    return InkWell(
+      onTap: () => Get.toNamed('/package-detail', arguments: {'id': package['id']}),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+              child: Stack(
+                children: [
+                  Image.network(
+                    package['image'] ?? 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=600&auto=format&fit=crop',
+                    height: 180.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    height: 180.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 12.h,
-                  left: 12.w,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (originalPrice != null && originalPrice != salePrice)
-                        Text(
-                          "₹$originalPrice",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12.sp,
-                            decoration: TextDecoration.lineThrough,
+                  Positioned(
+                    bottom: 12.h,
+                    left: 12.w,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (originalPrice != null && originalPrice.toString() != salePrice.toString())
+                          Text(
+                            "₹$originalPrice",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12.sp,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            "₹$salePrice",
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16.sp),
                           ),
                         ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          "₹$salePrice",
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16.sp),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  package['name'] ?? '',
-                  style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  package['details'] ?? package['description'] ?? 'Exclusive service bundle',
-                  style: TextStyle(color: Colors.white38, fontSize: 12.sp),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 16.h),
-                const Divider(color: Colors.white10),
-                SizedBox(height: 12.h),
-                Text(
-                  "INCLUDED SERVICES:",
-                  style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1),
-                ),
-                SizedBox(height: 8.h),
-                _buildIncludedServices(package['items'] ?? []),
-                SizedBox(height: 20.h),
-                SizedBox(
-                  width: double.infinity,
-                  height: 45.h,
-                  child: ElevatedButton(
-                    onPressed: () {}, 
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      side: const BorderSide(color: AppColors.primary),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ],
                     ),
-                    child: const Text("Book Package", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    package['name'] ?? '',
+                    style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    (package['details'] ?? package['description'] ?? 'Exclusive service bundle').toString().replaceAll(RegExp(r'<[^>]*>'), ''),
+                    style: TextStyle(color: Colors.white38, fontSize: 12.sp),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 16.h),
+                  const Divider(color: Colors.white10),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "INCLUDED SERVICES:",
+                    style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1),
+                  ),
+                  SizedBox(height: 8.h),
+                  _buildIncludedServices(package['items'] ?? []),
+                  SizedBox(height: 20.h),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 45.h,
+                    child: ElevatedButton(
+                      onPressed: () => Get.toNamed('/package-detail', arguments: {'id': package['id']}), 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text("Book Package", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -278,7 +282,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
