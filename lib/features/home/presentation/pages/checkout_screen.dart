@@ -5,6 +5,7 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -141,13 +142,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
 
       if (orderResponse.data['status'] == 'success') {
+        final authService = Get.find<AuthService>();
+        final userData = authService.userData;
+
         var options = {
-          'key': 'rzp_test_XXXXXXXXXXXXXX', // Replace with your key or fetch from config
+          'key': orderResponse.data['razorpay_key'],
           'amount': orderResponse.data['amount'],
           'name': 'Easy Saloon',
           'order_id': orderResponse.data['order_id'],
           'description': 'Booking Payment',
-          'prefill': {'contact': '', 'email': ''},
+          'prefill': {
+            'contact': userData['phone'] ?? '',
+            'email': userData['email'] ?? '',
+            'name': userData['name'] ?? ''
+          },
           'theme': {'color': '#D4AF37'}
         };
         _razorpay.open(options);
