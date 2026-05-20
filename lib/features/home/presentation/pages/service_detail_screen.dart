@@ -22,6 +22,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   List<String> _selectedEquipments = [];
   DateTime _selectedDate = DateTime.now();
   String _selectedSlot = 'Morning';
+  int _activeImageIndex = 0;
 
   @override
   void initState() {
@@ -103,15 +104,33 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   Widget _buildHeader() {
+    final List<dynamic> images = (_service['images'] is List)
+        ? _service['images']
+        : (_service['image'] != null ? [_service['image']] : ['https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=600&auto=format&fit=crop']);
+
     return Stack(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40.r)),
-          child: Image.network(
-            _service['image'] ?? 'https://images.unsplash.com/photo-1560869713-7d0a294308b3?q=80&w=600&auto=format&fit=crop',
-            width: double.infinity,
+          child: SizedBox(
             height: 320.h,
-            fit: BoxFit.cover,
+            width: double.infinity,
+            child: PageView.builder(
+              itemCount: images.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _activeImageIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                return Image.network(
+                  images[index].toString(),
+                  width: double.infinity,
+                  height: 320.h,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
           ),
         ),
         Container(
@@ -129,6 +148,27 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             ),
           ),
         ),
+        if (images.length > 1)
+          Positioned(
+            bottom: 120.h,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                images.length,
+                (index) => Container(
+                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  width: _activeImageIndex == index ? 16.w : 6.w,
+                  height: 6.h,
+                  decoration: BoxDecoration(
+                    color: _activeImageIndex == index ? AppColors.primary : Colors.white.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+            ),
+          ),
         Positioned(
           top: 50.h,
           left: 20.w,
@@ -320,14 +360,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           ),
 
           // Equipment Choice
-          if (_service['sub_category'] != null && _service['sub_category']['equipment'] != null && (_service['sub_category']['equipment'] as List).isNotEmpty) ...[
+          if (_service['equipment'] != null && (_service['equipment'] as List).isNotEmpty) ...[
             SizedBox(height: 30.h),
             Text("REQUIRED EQUIPMENT (OPTIONAL)", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
             SizedBox(height: 16.h),
             Wrap(
               spacing: 10.w,
               runSpacing: 10.h,
-              children: (_service['sub_category']['equipment'] as List).map((eq) {
+              children: (_service['equipment'] as List).map((eq) {
                 final isSelected = _selectedEquipments.contains(eq['name']);
                 return InkWell(
                   onTap: () {

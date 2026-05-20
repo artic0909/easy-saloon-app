@@ -82,8 +82,8 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       if (_selectedServices.any((s) => s['id'] == service['id'])) {
         _selectedServices.removeWhere((s) => s['id'] == service['id']);
         // Also remove its equipment
-        if (service['sub_category']?['equipment'] != null) {
-          for (var eq in service['sub_category']['equipment']) {
+        if (service['equipment'] != null) {
+          for (var eq in service['equipment']) {
             _selectedEquipments.remove(eq['name']);
           }
         }
@@ -402,9 +402,8 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
 
   Widget _buildModalEquipmentSection(StateSetter setModalState) {
     final servicesWithEquipment = _selectedServices.where((s) => 
-      s['sub_category'] != null && 
-      s['sub_category']['equipment'] != null && 
-      (s['sub_category']['equipment'] as List).isNotEmpty
+      s['equipment'] != null && 
+      (s['equipment'] as List).isNotEmpty
     ).toList();
 
     if (servicesWithEquipment.isEmpty) return const SizedBox.shrink();
@@ -415,7 +414,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
         SizedBox(height: 25.h),
         Text("REQUIRED EQUIPMENTS (OPTIONAL)", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold)),
         ...servicesWithEquipment.map((service) {
-          final List<dynamic> equipment = service['sub_category']['equipment'];
+          final List<dynamic> equipment = service['equipment'];
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

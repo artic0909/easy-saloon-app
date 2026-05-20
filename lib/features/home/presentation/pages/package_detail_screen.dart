@@ -453,9 +453,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     final List<dynamic> items = _package['items'] ?? [];
     final itemsWithEquipment = items.where((item) => 
       item['service'] != null && 
-      item['service']['sub_category'] != null && 
-      item['service']['sub_category']['equipment'] != null && 
-      (item['service']['sub_category']['equipment'] as List).isNotEmpty
+      item['service']['equipment'] != null && 
+      (item['service']['equipment'] as List).isNotEmpty
     ).toList();
 
     if (itemsWithEquipment.isEmpty) return const SizedBox.shrink();
@@ -467,7 +466,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
         Text("REQUIRED EQUIPMENTS (OPTIONAL)", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
         ...itemsWithEquipment.map((item) {
           final service = item['service'];
-          final List<dynamic> equipment = service['sub_category']['equipment'];
+          final List<dynamic> equipment = service['equipment'];
           
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

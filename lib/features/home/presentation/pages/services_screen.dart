@@ -19,15 +19,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
   
   List<dynamic> _services = [];
   List<dynamic> _categories = [];
-  List<dynamic> _allSubcategories = [];
-  List<dynamic> _filteredSubcategories = [];
   
   bool _isLoading = true;
   String _searchQuery = "";
   List<dynamic> _selectedCategoryIds = [];
-  List<dynamic> _selectedSubCategoryIds = [];
-  double _maxPrice = 11000;
-  double _currentPriceRange = 11000;
   String _sortBy = "newest";
 
   @override
@@ -55,25 +50,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
       if (response.data['status'] == 'success') {
         setState(() {
           _categories = response.data['data']['categories'] ?? [];
-          _allSubcategories = response.data['data']['subcategories'] ?? [];
-          _maxPrice = double.tryParse(response.data['data']['max_price'].toString()) ?? 11000;
-          if (_currentPriceRange >= 10000) _currentPriceRange = _maxPrice;
-          
-          _updateFilteredSubcategories();
         });
       }
     } catch (e) {
       debugPrint("Error fetching filters: $e");
-    }
-  }
-
-  void _updateFilteredSubcategories() {
-    if (_selectedCategoryIds.isEmpty) {
-      _filteredSubcategories = [];
-    } else {
-      _filteredSubcategories = _allSubcategories.where((sub) {
-        return _selectedCategoryIds.map((id) => id.toString()).contains(sub['category_id'].toString());
-      }).toList();
     }
   }
 
@@ -84,14 +64,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
       Map<String, dynamic> params = {
         'search': _searchQuery,
         'sort': _sortBy,
-        'max_price': _currentPriceRange,
       };
       
       if (_selectedCategoryIds.isNotEmpty) {
         params['category_id'] = _selectedCategoryIds.join(',');
-      }
-      if (_selectedSubCategoryIds.isNotEmpty) {
-        params['subcategory_id'] = _selectedSubCategoryIds.join(',');
       }
 
       final response = await _apiService.dio.get('/services', queryParameters: params);
@@ -308,9 +284,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
                         onTap: () {
                           setState(() {
                             _selectedCategoryIds = [];
-                            _selectedSubCategoryIds = [];
-                            _filteredSubcategories = [];
-                            _currentPriceRange = _maxPrice;
                             _sortBy = "newest";
                           });
                           _fetchServices();
@@ -338,77 +311,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
                           setModalState(() {
                             if (isSelected) {
                               _selectedCategoryIds.removeWhere((id) => id.toString() == cat['id'].toString());
-                              _selectedSubCategoryIds.removeWhere((subId) {
-                                final sub = _allSubcategories.firstWhere((s) => s['id'].toString() == subId.toString(), orElse: () => null);
-                                return sub != null && sub['category_id'].toString() == cat['id'].toString();
-                              });
                             } else {
                               _selectedCategoryIds.add(cat['id']);
                             }
-                            _updateFilteredSubcategories();
                           });
                         },
                       );
                     }).toList(),
-                  ),
-
-                  if (_filteredSubcategories.isNotEmpty) ...[
-                    SizedBox(height: 32.h),
-                    _buildFilterHeader("SUB CATEGORIES"),
-                    SizedBox(height: 16.h),
-                    Column(
-                      children: _filteredSubcategories.map((sub) {
-                        final isSelected = _selectedSubCategoryIds.map((id) => id.toString()).contains(sub['id'].toString());
-                        return _buildFilterItem(
-                          sub['name'] ?? '',
-                          isSelected,
-                          () => setModalState(() {
-                            if (isSelected) {
-                              _selectedSubCategoryIds.removeWhere((id) => id.toString() == sub['id'].toString());
-                            } else {
-                              _selectedSubCategoryIds.add(sub['id']);
-                            }
-                          }),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-
-                  SizedBox(height: 32.h),
-
-                  _buildFilterHeader("MAX PRICE"),
-                  SizedBox(height: 16.h),
-                  SliderTheme(
-                    data: SliderThemeData(
-                      activeTrackColor: AppColors.primary,
-                      inactiveTrackColor: Colors.white10,
-                      thumbColor: AppColors.primary,
-                      overlayColor: AppColors.primary.withOpacity(0.1),
-                    ),
-                    child: Slider(
-                      value: _currentPriceRange.clamp(0, _maxPrice),
-                      min: 0,
-                      max: _maxPrice > 0 ? _maxPrice : 1,
-                      onChanged: (val) => setModalState(() => _currentPriceRange = val),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("₹0", style: TextStyle(color: Colors.white38, fontSize: 10.sp)),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text("₹${_currentPriceRange.toInt()}", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.sp)),
-                        ),
-                        Text("₹${_maxPrice.toInt()}+", style: TextStyle(color: Colors.white38, fontSize: 10.sp)),
-                      ],
-                    ),
                   ),
                   
                   SizedBox(height: 40.h),
