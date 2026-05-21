@@ -10,6 +10,7 @@ import 'package:easysaloonapp/features/home/presentation/pages/notifications_scr
 import 'package:easysaloonapp/features/home/presentation/pages/coupons_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/services_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/packages_screen.dart';
+import 'package:easysaloonapp/features/home/presentation/pages/category_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/service_detail_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/package_detail_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/custom_package_screen.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/notifications', page: () => const NotificationsScreen()),
             GetPage(name: '/coupons', page: () => const CouponsScreen()),
             GetPage(name: '/services', page: () => const ServicesScreen()),
+            GetPage(name: '/categories', page: () => const CategoryScreen()),
             GetPage(name: '/packages', page: () => const PackagesScreen()),
             GetPage(name: '/service-detail', page: () => const ServiceDetailScreen()),
             GetPage(name: '/package-detail', page: () => const PackageDetailScreen()),

@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> _coupons = [];
   List<dynamic> _categories = [];
   List<dynamic> _filteredCategories = [];
-  
+
   late PageController _pageController;
   Timer? _timer;
   int _activePage = 0;
@@ -48,11 +48,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _fetchAllData() async {
-    await Future.wait([
-      _fetchBanners(),
-      _fetchCoupons(),
-      _fetchCategories(),
-    ]);
+    await Future.wait([_fetchBanners(), _fetchCoupons(), _fetchCategories()]);
   }
 
   Future<void> _fetchBanners() async {
@@ -99,9 +95,10 @@ class _HomePageState extends State<HomePage> {
   void _filterCategories() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredCategories = _categories.where((cat) {
-        return cat['name'].toString().toLowerCase().contains(query);
-      }).toList();
+      _filteredCategories =
+          _categories.where((cat) {
+            return cat['name'].toString().toLowerCase().contains(query);
+          }).toList();
     });
   }
 
@@ -171,11 +168,19 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.construction, size: 64, color: AppColors.primary.withValues(alpha: 0.5)),
+          Icon(
+            Icons.construction,
+            size: 64,
+            color: AppColors.primary.withValues(alpha: 0.5),
+          ),
           SizedBox(height: 16.h),
           Text(
             title,
-            style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Playfair Display'),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24.sp,
+              fontFamily: 'Playfair Display',
+            ),
           ),
           Text(
             "Coming Soon",
@@ -224,7 +229,11 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Stack(
                 children: [
-                  const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
+                  const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                   Positioned(
                     right: 2,
                     top: 2,
@@ -259,7 +268,7 @@ class _HomePageState extends State<HomePage> {
           controller: _searchController,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: "Search categories...",
+            hintText: "Search Services...",
             hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
             border: InputBorder.none,
@@ -295,7 +304,11 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   right: -20,
                   top: -20,
-                  child: Icon(Icons.stars, size: 100, color: Colors.white.withValues(alpha: 0.1)),
+                  child: Icon(
+                    Icons.stars,
+                    size: 100,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -317,7 +330,9 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             coupon['title'] ?? 'Discount Coupon',
                             style: TextStyle(
-                              color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+                              color: AppColors.textOnPrimary.withValues(
+                                alpha: 0.8,
+                              ),
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                             ),
@@ -335,7 +350,10 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -368,7 +386,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Categories",
+            "Services",
             style: TextStyle(
               fontSize: 22.sp,
               fontFamily: 'Playfair Display',
@@ -379,11 +397,17 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.grid_view, color: _isGridView ? AppColors.primary : Colors.white24),
+                icon: Icon(
+                  Icons.grid_view,
+                  color: _isGridView ? AppColors.primary : Colors.white24,
+                ),
                 onPressed: () => setState(() => _isGridView = true),
               ),
               IconButton(
-                icon: Icon(Icons.list, color: !_isGridView ? AppColors.primary : Colors.white24),
+                icon: Icon(
+                  Icons.list,
+                  color: !_isGridView ? AppColors.primary : Colors.white24,
+                ),
                 onPressed: () => setState(() => _isGridView = false),
               ),
             ],
@@ -398,7 +422,10 @@ class _HomePageState extends State<HomePage> {
       return Center(
         child: Padding(
           padding: EdgeInsets.only(top: 40.h),
-          child: Text("No categories found", style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
+          child: Text(
+            "No categories found",
+            style: TextStyle(color: Colors.white38, fontSize: 14.sp),
+          ),
         ),
       );
     }
@@ -443,12 +470,16 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCategoryCard(dynamic cat) {
     return GestureDetector(
-      onTap: () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
+      onTap:
+          () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           image: DecorationImage(
-            image: NetworkImage(cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400&auto=format&fit=crop'),
+            image: NetworkImage(
+              cat['image'] ??
+                  'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400&auto=format&fit=crop',
+            ),
             fit: BoxFit.cover,
           ),
         ),
@@ -465,7 +496,11 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.bottomLeft,
           child: Text(
             cat['name'] ?? '',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14.sp,
+            ),
           ),
         ),
       ),
@@ -474,7 +509,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCategoryListItem(dynamic cat) {
     return GestureDetector(
-      onTap: () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
+      onTap:
+          () => Get.toNamed('/services', arguments: {'category_id': cat['id']}),
       child: Container(
         height: 80.h,
         decoration: BoxDecoration(
@@ -485,9 +521,12 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(11),
+              ),
               child: Image.network(
-                cat['image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop',
+                cat['image'] ??
+                    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=200&auto=format&fit=crop',
                 width: 80.h,
                 height: 80.h,
                 fit: BoxFit.cover,
@@ -497,7 +536,11 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 cat['name'] ?? '',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
+                ),
               ),
             ),
             const Icon(Icons.chevron_right, color: AppColors.primary),
@@ -514,7 +557,9 @@ class _HomePageState extends State<HomePage> {
         height: 450.h,
         width: double.infinity,
         color: AppColors.surface,
-        child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        child: const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
@@ -563,7 +608,8 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildStyledTitle(banner['title'] ?? ''),
-                        if (banner['subtitle'] != null && banner['subtitle'].toString().isNotEmpty) ...[
+                        if (banner['subtitle'] != null &&
+                            banner['subtitle'].toString().isNotEmpty) ...[
                           SizedBox(height: 8.h),
                           Text(
                             banner['subtitle'].toString().toUpperCase(),
@@ -594,7 +640,10 @@ class _HomePageState extends State<HomePage> {
                   height: 4,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(2),
-                    color: _activePage == index ? AppColors.primary : Colors.white24,
+                    color:
+                        _activePage == index
+                            ? AppColors.primary
+                            : Colors.white24,
                   ),
                 ),
               ),
@@ -609,7 +658,7 @@ class _HomePageState extends State<HomePage> {
     final processedTitle = title.replaceAll('|', '\n');
     final regex = RegExp(r'\*(.*?)\*');
     final matches = regex.allMatches(processedTitle);
-    
+
     if (matches.isEmpty) {
       return Text(
         processedTitle,
@@ -628,23 +677,29 @@ class _HomePageState extends State<HomePage> {
 
     for (final match in matches) {
       if (match.start > lastMatchEnd) {
-        spans.add(TextSpan(
-          text: processedTitle.substring(lastMatchEnd, match.start),
-          style: const TextStyle(color: Colors.white),
-        ));
+        spans.add(
+          TextSpan(
+            text: processedTitle.substring(lastMatchEnd, match.start),
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
       }
-      spans.add(TextSpan(
-        text: match.group(1),
-        style: const TextStyle(color: AppColors.primary),
-      ));
+      spans.add(
+        TextSpan(
+          text: match.group(1),
+          style: const TextStyle(color: AppColors.primary),
+        ),
+      );
       lastMatchEnd = match.end;
     }
 
     if (lastMatchEnd < processedTitle.length) {
-      spans.add(TextSpan(
-        text: processedTitle.substring(lastMatchEnd),
-        style: const TextStyle(color: Colors.white),
-      ));
+      spans.add(
+        TextSpan(
+          text: processedTitle.substring(lastMatchEnd),
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
     }
 
     return RichText(

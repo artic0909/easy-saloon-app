@@ -60,7 +60,10 @@ class AppDrawer extends StatelessWidget {
                   Get.back();
                   Get.toNamed('/notifications');
                 }),
-                _buildDrawerItem(Icons.grid_view_outlined, "Categories", () => Get.back()),
+                _buildDrawerItem(Icons.grid_view_outlined, "Categories", () {
+                  Get.back();
+                  Get.toNamed('/categories');
+                }),
                 _buildDrawerItem(Icons.content_cut, "Services", () {
                   Get.back();
                   Get.toNamed('/services');
