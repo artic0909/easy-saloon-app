@@ -499,49 +499,49 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
             // Staff / Stylist Card embedded
             if (staff != null) ...[
               SizedBox(height: 16.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16.r,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                      backgroundImage: staff['photo'] != null
-                          ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
-                          : null,
-                      child: staff['photo'] == null
-                          ? Icon(Icons.person, color: AppColors.primary, size: 18.w)
-                          : null,
-                    ),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "ASSIGNED PROFESSIONAL",
-                            style: TextStyle(color: Colors.white30, fontSize: 8.sp, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            staff['name']?.toString() ?? '',
-                            style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold),
-                          ),
-                        ],
+              InkWell(
+                onTap: staff['phone'] != null
+                    ? () => _callStylist(staff['phone'].toString())
+                    : null,
+                borderRadius: BorderRadius.circular(12.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16.r,
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        backgroundImage: staff['photo'] != null
+                            ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
+                            : null,
+                        child: staff['photo'] == null
+                            ? Icon(Icons.person, color: AppColors.primary, size: 18.w)
+                            : null,
                       ),
-                    ),
-                    if (staff['phone'] != null)
-                      IconButton(
-                        onPressed: () => _callStylist(staff['phone'].toString()),
-                        icon: const Icon(Icons.phone_in_talk, color: AppColors.primary),
-                        iconSize: 20.w,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "ASSIGNED PROFESSIONAL",
+                              style: TextStyle(color: Colors.white30, fontSize: 8.sp, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              staff['name']?.toString() ?? '',
+                              style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
-                  ],
+                      if (staff['phone'] != null)
+                        Icon(Icons.phone_in_talk, color: AppColors.primary, size: 20.w),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -642,50 +642,50 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                       ),
                     ),
                     SizedBox(height: 10.h),
-                    Container(
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.08), width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
-                            backgroundImage: staff['photo'] != null
-                                ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
-                                : null,
-                            child: staff['photo'] == null
-                                ? Icon(Icons.person, color: AppColors.primary, size: 24.w)
-                                : null,
-                          ),
-                          SizedBox(width: 14.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  staff['name']?.toString() ?? '',
-                                  style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  "Luxury Styling Specialist",
-                                  style: TextStyle(color: Colors.white30, fontSize: 10.sp, fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                    InkWell(
+                      onTap: staff['phone'] != null
+                          ? () => _callStylist(staff['phone'].toString())
+                          : null,
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: AppColors.primary.withOpacity(0.08), width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20.r,
+                              backgroundColor: AppColors.primary.withOpacity(0.1),
+                              backgroundImage: staff['photo'] != null
+                                  ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
+                                  : null,
+                              child: staff['photo'] == null
+                                  ? Icon(Icons.person, color: AppColors.primary, size: 24.w)
+                                  : null,
                             ),
-                          ),
-                          if (staff['phone'] != null)
-                            IconButton(
-                              onPressed: () => _callStylist(staff['phone'].toString()),
-                              icon: const Icon(Icons.phone_in_talk, color: AppColors.primary),
-                              iconSize: 22.w,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
+                            SizedBox(width: 14.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    staff['name']?.toString() ?? '',
+                                    style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "Luxury Styling Specialist",
+                                    style: TextStyle(color: Colors.white30, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
                             ),
-                        ],
+                            if (staff['phone'] != null)
+                              Icon(Icons.phone_in_talk, color: AppColors.primary, size: 22.w),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: 24.h),
