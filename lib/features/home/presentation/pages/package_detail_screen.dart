@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class PackageDetailScreen extends StatefulWidget {
   const PackageDetailScreen({super.key});
@@ -189,9 +190,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           ),
         ),
         SizedBox(height: 12.h),
-        Text(
-          (_package['details'] ?? _package['description'] ?? 'No details provided.').toString().replaceAll(RegExp(r'<[^>]*>'), ''),
-          style: TextStyle(color: Colors.white60, fontSize: 14.sp, height: 1.6),
+        HtmlWidget(
+          (_package['details'] ?? _package['description'] ?? 'No details provided.').toString(),
+          textStyle: TextStyle(color: Colors.white60, fontSize: 14.sp, height: 1.6),
         ),
       ],
     );

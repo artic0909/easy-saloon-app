@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   const ServiceDetailScreen({super.key});
@@ -229,9 +230,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           ),
         ),
         SizedBox(height: 16.h),
-        Text(
-          _service['details']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? 'No details provided.',
-          style: TextStyle(color: Colors.white60, fontSize: 14.sp, height: 1.6),
+        HtmlWidget(
+          (_service['details'] ?? 'No details provided.').toString(),
+          textStyle: TextStyle(color: Colors.white60, fontSize: 14.sp, height: 1.6),
         ),
         SizedBox(height: 12.h),
         Text(
