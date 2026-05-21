@@ -20,7 +20,6 @@ class _PackagesScreenState extends State<PackagesScreen> {
   List<dynamic> _packages = [];
   List<dynamic> _filteredPackages = [];
   bool _isLoading = true;
-  String _searchQuery = "";
 
   @override
   void initState() {
@@ -47,7 +46,6 @@ class _PackagesScreenState extends State<PackagesScreen> {
 
   void _filterPackages(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredPackages = _packages;
       } else {
@@ -120,7 +118,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
         child: TextField(
           style: const TextStyle(color: Colors.white),
@@ -160,10 +158,10 @@ class _PackagesScreenState extends State<PackagesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -188,7 +186,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
                       ),
                     ),
                   ),
@@ -282,7 +280,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(

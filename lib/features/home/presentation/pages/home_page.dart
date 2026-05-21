@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
-import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
@@ -19,7 +18,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
-  final AuthService _authService = Get.find<AuthService>();
   final ApiService _apiService = ApiService();
 
   List<dynamic> _banners = [];

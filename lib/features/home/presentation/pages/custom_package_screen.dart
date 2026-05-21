@@ -18,7 +18,6 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
   List<dynamic> _categories = [];
   List<dynamic> _filteredCategories = [];
   final List<dynamic> _selectedServices = [];
-  String _searchQuery = "";
   
   // Booking selections
   String _serviceLocation = 'home';
@@ -44,13 +43,12 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar("Error", "Failed to load data", backgroundColor: Colors.red.withOpacity(0.7));
+      Get.snackbar("Error", "Failed to load data", backgroundColor: Colors.red.withValues(alpha: 0.7));
     }
   }
 
   void _filterServices(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredCategories = _categories;
       } else {
@@ -95,7 +93,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
 
   void _handleBooking() {
     if (_selectedServices.isEmpty) {
-      Get.snackbar("Error", "Please select at least one service", backgroundColor: Colors.red.withOpacity(0.7));
+      Get.snackbar("Error", "Please select at least one service", backgroundColor: Colors.red.withValues(alpha: 0.7));
       return;
     }
 
@@ -148,7 +146,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
                               style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold, letterSpacing: 2),
                             ),
                           ),
-                          ...services.map((service) => _buildServiceItem(service)).toList(),
+                          ...services.map((service) => _buildServiceItem(service)),
                           SizedBox(height: 10.h),
                         ],
                       );
@@ -168,7 +166,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(15.r),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: TextField(
           style: const TextStyle(color: Colors.white),
@@ -194,9 +192,9 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
         margin: EdgeInsets.only(bottom: 12.h),
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withOpacity(0.05) : AppColors.surface,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : AppColors.surface,
           borderRadius: BorderRadius.circular(15.r),
-          border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05)),
+          border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
@@ -337,9 +335,9 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -439,9 +437,9 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                        color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1)),
+                        border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.1)),
                       ),
                       child: Text(
                         eq['name'],
@@ -453,7 +451,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
               ),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -464,7 +462,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 15.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(15.r),
         ),
         child: Column(
@@ -484,7 +482,7 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Center(
