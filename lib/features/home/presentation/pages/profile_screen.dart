@@ -75,8 +75,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetchAddresses() async {
     if (!mounted) return;
     setState(() => _isFetchingAddresses = true);
+    debugPrint("=== DEBUG: Fetching Addresses ===");
+    debugPrint("=== DEBUG: Current User Data: ${authService.userData}");
     try {
       final response = await _apiService.dio.get('/profile/addresses');
+      debugPrint("=== DEBUG: Addresses Response Status: ${response.statusCode}");
+      debugPrint("=== DEBUG: Addresses Response Data: ${response.data}");
+      
       if (response.data['status'] == 'success') {
         if (!mounted) return;
         setState(() {
@@ -90,7 +95,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isFetchingAddresses = false);
-      debugPrint("Error fetching addresses: $e");
+      debugPrint("=== DEBUG: Error fetching addresses: $e");
+      if (e is DioException) {
+        debugPrint("=== DEBUG: Dio Error Response: ${e.response?.data}");
+        debugPrint("=== DEBUG: Dio Error Status Code: ${e.response?.statusCode}");
+      }
     }
   }
 
