@@ -55,7 +55,10 @@ class AppDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 8.h),
               children: [
-                _buildDrawerItem(Icons.person_outline, "My Profile", () => Get.back()),
+                _buildDrawerItem(Icons.person_outline, "My Profile", () {
+                  Get.back();
+                  Get.toNamed('/profile');
+                }),
                 _buildDrawerItem(Icons.notifications_outlined, "Notifications", () {
                   Get.back();
                   Get.toNamed('/notifications');

@@ -30,12 +30,12 @@ class AuthService extends GetxService {
       }
       
       // Silently refresh profile in background
-      _refreshProfile();
+      refreshProfile();
     }
     return this;
   }
 
-  Future<void> _refreshProfile() async {
+  Future<void> refreshProfile() async {
     try {
       final response = await _apiService.dio.get('/profile');
       if (response.data['status'] == 'success') {
