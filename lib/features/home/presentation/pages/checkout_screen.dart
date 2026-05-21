@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:dio/dio.dart';
@@ -17,17 +18,17 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ApiService _apiService = ApiService();
   late Razorpay _razorpay;
-  
+
   // Data passed from previous screens
   late String type; // 'service', 'package', 'custom'
   late dynamic itemData;
   late Map<String, dynamic> bookingDetails;
-  
+
   bool _isLoading = true;
   List<dynamic> _addresses = [];
   int? _selectedAddressId;
   String _paymentMethod = 'online'; // 'cod' or 'online'
-  
+
   dynamic _bookingResponse;
 
   // Coupon state
@@ -45,12 +46,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     type = args['type'];
     itemData = args['itemData'];
     bookingDetails = args['bookingDetails'];
-    
+
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-    
+
     _fetchAddresses();
   }
 
@@ -97,7 +98,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _verifyCoupon() async {
     final code = _couponController.text.trim();
     if (code.isEmpty) {
-      Get.snackbar("Warning", "Please enter a coupon code", backgroundColor: Colors.amber.withValues(alpha: 0.7));
+      Get.snackbar(
+        "Warning",
+        "Please enter a coupon code",
+        backgroundColor: Colors.amber.withOpacity(0.7),
+      );
       return;
     }
 
@@ -108,17 +113,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
-      final response = await _apiService.dio.post('/coupons/verify', data: {
-        'code': code,
-        'amount': _totalPrice,
-      });
+      final response = await _apiService.dio.post(
+        '/coupons/verify',
+        data: {'code': code, 'amount': _totalPrice},
+      );
 
       if (response.data['status'] == 'success') {
         final couponData = response.data['data'];
         setState(() {
           _appliedCouponCode = couponData['code'];
-          _couponDiscount = double.tryParse(couponData['discount_amount'].toString()) ?? 0.0;
-          _couponSuccessMessage = "Coupon applied! You saved ₹${_couponDiscount.toStringAsFixed(2)}";
+          _couponDiscount =
+              double.tryParse(couponData['discount_amount'].toString()) ?? 0.0;
+          _couponSuccessMessage =
+              "Coupon applied! You saved ₹${_couponDiscount.toStringAsFixed(2)}";
           _couponError = null;
           _isCouponVerifying = false;
         });
@@ -158,7 +165,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Future<void> _processBooking() async {
     if (bookingDetails['location'] == 'home' && _selectedAddressId == null) {
-      Get.snackbar("Error", "Please select an address for home service", backgroundColor: Colors.red.withValues(alpha: 0.7));
+      Get.snackbar(
+        "Error",
+        "Please select an address for home service",
+        backgroundColor: Colors.red.withOpacity(0.7),
+      );
       return;
     }
 
@@ -183,7 +194,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         payload['package_id'] = itemData['id'];
       } else {
         endpoint = '/bookings/custom-package';
-        payload['service_ids'] = (itemData as List).map((s) => s['id']).toList();
+        payload['service_ids'] =
+            (itemData as List).map((s) => s['id']).toList();
       }
 
       if (_appliedCouponCode != null) {
@@ -202,19 +214,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar("Error", "Booking failed", backgroundColor: Colors.red.withValues(alpha: 0.7));
+      Get.snackbar(
+        "Error",
+        "Booking failed",
+        backgroundColor: Colors.red.withOpacity(0.7),
+      );
     }
   }
 
   Future<void> _startRazorpayPayment() async {
     try {
       final bookingId = _bookingResponse['data']['id'];
-      final bookingType = _bookingResponse['booking_type'] ?? (type == 'custom' ? 'custom' : 'regular');
+      final bookingType =
+          _bookingResponse['booking_type'] ??
+          (type == 'custom' ? 'custom' : 'regular');
 
-      final orderResponse = await _apiService.dio.post('/payments/create-order', data: {
-        'booking_id': bookingId,
-        'booking_type': bookingType,
-      });
+      final orderResponse = await _apiService.dio.post(
+        '/payments/create-order',
+        data: {'booking_id': bookingId, 'booking_type': bookingType},
+      );
 
       if (orderResponse.data['status'] == 'success') {
         final authService = Get.find<AuthService>();
@@ -229,40 +247,57 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           'prefill': {
             'contact': userData['phone'] ?? '',
             'email': userData['email'] ?? '',
-            'name': userData['name'] ?? ''
+            'name': userData['name'] ?? '',
           },
-          'theme': {'color': '#D4AF37'}
+          'theme': {'color': '#D4AF37'},
         };
         _razorpay.open(options);
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar("Payment Error", "Failed to initialize payment", backgroundColor: Colors.red.withValues(alpha: 0.7));
+      Get.snackbar(
+        "Payment Error",
+        "Failed to initialize payment",
+        backgroundColor: Colors.red.withOpacity(0.7),
+      );
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     try {
       final bookingId = _bookingResponse['data']['id'];
-      final bookingType = _bookingResponse['booking_type'] ?? (type == 'custom' ? 'custom' : 'regular');
+      final bookingType =
+          _bookingResponse['booking_type'] ??
+          (type == 'custom' ? 'custom' : 'regular');
 
-      await _apiService.dio.post('/payments/verify', data: {
-        'booking_id': bookingId,
-        'booking_type': bookingType,
-        'razorpay_payment_id': response.paymentId,
-        'razorpay_order_id': response.orderId,
-        'razorpay_signature': response.signature,
-      });
+      await _apiService.dio.post(
+        '/payments/verify',
+        data: {
+          'booking_id': bookingId,
+          'booking_type': bookingType,
+          'razorpay_payment_id': response.paymentId,
+          'razorpay_order_id': response.orderId,
+          'razorpay_signature': response.signature,
+        },
+      );
 
       _showSuccessDialog();
     } catch (e) {
-      Get.snackbar("Verification Failed", "Please contact support", backgroundColor: Colors.red.withValues(alpha: 0.7));
+      Get.snackbar(
+        "Verification Failed",
+        "Please contact support",
+        backgroundColor: Colors.red.withOpacity(0.7),
+      );
     }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     setState(() => _isLoading = false);
-    Get.snackbar("Payment Failed", response.message ?? "User cancelled", backgroundColor: Colors.red.withValues(alpha: 0.7));
+    Get.snackbar(
+      "Payment Failed",
+      response.message ?? "User cancelled",
+      backgroundColor: Colors.red.withOpacity(0.7),
+    );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {}
@@ -270,9 +305,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _showSuccessDialog() {
     Get.defaultDialog(
       title: "Booking Confirmed!",
-      middleText: "Your luxury session is scheduled. Check your email for details.",
+      middleText:
+          "Your luxury session is scheduled. Check your email for details.",
       backgroundColor: AppColors.surface,
-      titleStyle: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+      titleStyle: const TextStyle(
+        color: AppColors.primary,
+        fontWeight: FontWeight.bold,
+      ),
       middleTextStyle: const TextStyle(color: Colors.white70),
       confirm: ElevatedButton(
         onPressed: () => Get.offAllNamed('/home'),
@@ -289,29 +328,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text("Checkout", style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20.sp, color: Colors.white)),
+        title: Text(
+          "Checkout",
+          style: TextStyle(
+            fontFamily: 'Playfair Display',
+            fontSize: 20.sp,
+            color: Colors.white,
+          ),
+        ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSummarySection(),
-                  SizedBox(height: 30.h),
-                  if (bookingDetails['location'] == 'home') _buildAddressSection(),
-                  SizedBox(height: 30.h),
-                  _buildPaymentMethodSection(),
-                  SizedBox(height: 30.h),
-                  _buildCouponSection(),
-                  SizedBox(height: 40.h),
-                  _buildPriceBreakdown(),
-                  SizedBox(height: 40.h),
-                  _buildPayButton(),
-                ],
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              )
+              : SingleChildScrollView(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSummarySection(),
+                    SizedBox(height: 30.h),
+                    if (bookingDetails['location'] == 'home')
+                      _buildAddressSection(),
+                    SizedBox(height: 30.h),
+                    _buildPaymentMethodSection(),
+                    SizedBox(height: 30.h),
+                    _buildCouponSection(),
+                    SizedBox(height: 40.h),
+                    _buildPriceBreakdown(),
+                    SizedBox(height: 40.h),
+                    _buildPayButton(),
+                  ],
+                ),
               ),
-            ),
     );
   }
 
@@ -321,34 +371,72 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("BOOKING SUMMARY", style: TextStyle(color: AppColors.primary, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+          Text(
+            "BOOKING SUMMARY",
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 10.sp,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
           SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Type", style: TextStyle(color: Colors.white54, fontSize: 13.sp)),
-              Text(type.toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+              Text(
+                "Type",
+                style: TextStyle(color: Colors.white54, fontSize: 13.sp),
+              ),
+              Text(
+                type.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Location", style: TextStyle(color: Colors.white54, fontSize: 13.sp)),
-              Text(bookingDetails['location'].toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+              Text(
+                "Location",
+                style: TextStyle(color: Colors.white54, fontSize: 13.sp),
+              ),
+              Text(
+                bookingDetails['location'].toUpperCase(),
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Date & Time", style: TextStyle(color: Colors.white54, fontSize: 13.sp)),
-              Text("${bookingDetails['date']} (${bookingDetails['slot']})", style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+              Text(
+                "Date & Time",
+                style: TextStyle(color: Colors.white54, fontSize: 13.sp),
+              ),
+              Text(
+                "${bookingDetails['date']} (${bookingDetails['slot']})",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ],
@@ -360,19 +448,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("SELECT ADDRESS", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+        Text(
+          "SELECT ADDRESS",
+          style: TextStyle(
+            color: Colors.white38,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         SizedBox(height: 15.h),
         if (_addresses.isEmpty)
           Center(
             child: Column(
               children: [
-                Text("No addresses found", style: TextStyle(color: Colors.white24, fontSize: 12.sp)),
-                TextButton(onPressed: () {}, child: const Text("Add New Address", style: TextStyle(color: AppColors.primary))),
+                Text(
+                  "No addresses found",
+                  style: TextStyle(color: Colors.white24, fontSize: 12.sp),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Add New Address",
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
               ],
             ),
           )
         else
-          ..._addresses.map((addr) => _buildAddressItem(addr)),
+          ..._addresses.map((addr) => _buildAddressItem(addr)).toList(),
       ],
     );
   }
@@ -385,24 +489,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         margin: EdgeInsets.only(bottom: 12.h),
         padding: EdgeInsets.all(15.w),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : AppColors.surface,
+          color:
+              isSelected
+                  ? AppColors.primary.withOpacity(0.05)
+                  : AppColors.surface,
           borderRadius: BorderRadius.circular(15.r),
-          border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05)),
+          border: Border.all(
+            color:
+                isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+          ),
         ),
         child: Row(
           children: [
-            Icon(Icons.location_on_outlined, color: isSelected ? AppColors.primary : Colors.white24),
+            Icon(
+              Icons.location_on_outlined,
+              color: isSelected ? AppColors.primary : Colors.white24,
+            ),
             SizedBox(width: 15.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(addr['title']?.toString().toUpperCase() ?? 'HOME', style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                  Text("${addr['full_address']}, ${addr['city']?['name']}", style: TextStyle(color: Colors.white54, fontSize: 11.sp)),
+                  Text(
+                    addr['title']?.toString().toUpperCase() ?? 'HOME',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "${addr['full_address']}, ${addr['city']?['name']}",
+                    style: TextStyle(color: Colors.white54, fontSize: 11.sp),
+                  ),
                 ],
               ),
             ),
-            if (isSelected) const Icon(Icons.check_circle, color: AppColors.primary),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: AppColors.primary),
           ],
         ),
       ),
@@ -413,13 +537,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("PAYMENT METHOD", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+        Text(
+          "PAYMENT METHOD",
+          style: TextStyle(
+            color: Colors.white38,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         SizedBox(height: 15.h),
         Row(
           children: [
-            Expanded(child: _buildPaymentMethodItem('online', "Pay Online", Icons.payment_outlined)),
+            Expanded(
+              child: _buildPaymentMethodItem(
+                'online',
+                "Pay Online",
+                Icons.payment_outlined,
+              ),
+            ),
             SizedBox(width: 15.w),
-            Expanded(child: _buildPaymentMethodItem('cod', "Pay at Salon/Home", Icons.payments_outlined)),
+            Expanded(
+              child: _buildPaymentMethodItem(
+                'cod',
+                "Pay at Salon/Home",
+                Icons.payments_outlined,
+              ),
+            ),
           ],
         ),
       ],
@@ -435,13 +578,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05)),
+          border: Border.all(
+            color:
+                isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+          ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? Colors.black : Colors.white38, size: 24.sp),
+            Icon(
+              icon,
+              color: isSelected ? Colors.black : Colors.white38,
+              size: 24.sp,
+            ),
             SizedBox(height: 8.h),
-            Text(title, style: TextStyle(color: isSelected ? Colors.black : Colors.white38, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white38,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -457,8 +614,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Subtotal", style: TextStyle(color: Colors.white54, fontSize: 14.sp)),
-            Text("₹${_totalPrice.toStringAsFixed(2)}", style: TextStyle(color: Colors.white, fontSize: 14.sp)),
+            Text(
+              "Subtotal",
+              style: TextStyle(color: Colors.white54, fontSize: 14.sp),
+            ),
+            Text(
+              "₹${_totalPrice.toStringAsFixed(2)}",
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+            ),
           ],
         ),
         if (_couponDiscount > 0) ...[
@@ -466,8 +629,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Coupon Discount ($_appliedCouponCode)", style: TextStyle(color: Colors.white54, fontSize: 14.sp)),
-              Text("- ₹${_couponDiscount.toStringAsFixed(2)}", style: TextStyle(color: Colors.greenAccent, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+              Text(
+                "Coupon Discount (${_appliedCouponCode})",
+                style: TextStyle(color: Colors.white54, fontSize: 14.sp),
+              ),
+              Text(
+                "- ₹${_couponDiscount.toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: Colors.greenAccent,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ],
@@ -475,7 +648,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Taxes & Fees", style: TextStyle(color: Colors.white54, fontSize: 14.sp)),
+            Text(
+              "Taxes & Fees",
+              style: TextStyle(color: Colors.white54, fontSize: 14.sp),
+            ),
             Text("₹0", style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ],
         ),
@@ -483,8 +659,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Total Payable", style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-            Text("₹${payableAmount.toStringAsFixed(2)}", style: TextStyle(color: AppColors.primary, fontSize: 18.sp, fontWeight: FontWeight.w900)),
+            Text(
+              "Total Payable",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "₹${payableAmount.toStringAsFixed(2)}",
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
           ],
         ),
       ],
@@ -495,14 +685,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("APPLY COUPON CODE", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        Text(
+          "APPLY COUPON CODE",
+          style: TextStyle(
+            color: Colors.white38,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
         SizedBox(height: 15.h),
         Container(
           padding: EdgeInsets.all(15.w),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,12 +710,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   Expanded(
                     child: TextField(
                       controller: _couponController,
-                      enabled: _appliedCouponCode == null && !_isCouponVerifying,
-                      style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      enabled:
+                          _appliedCouponCode == null && !_isCouponVerifying,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                       textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
                         hintText: "Enter coupon code...",
-                        hintStyle: TextStyle(color: Colors.white24, fontSize: 13.sp),
+                        hintStyle: TextStyle(
+                          color: Colors.white24,
+                          fontSize: 13.sp,
+                        ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(horizontal: 5.w),
                       ),
@@ -526,48 +733,74 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   SizedBox(width: 10.w),
                   _appliedCouponCode != null
                       ? TextButton(
-                          onPressed: _removeCoupon,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
-                            textStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                          ),
-                          child: const Text("REMOVE"),
-                        )
-                      : SizedBox(
-                          height: 38.h,
-                          child: ElevatedButton(
-                            onPressed: _isCouponVerifying ? null : _verifyCoupon,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.black,
-                              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(horizontal: 20.w),
-                            ),
-                            child: _isCouponVerifying
-                                ? SizedBox(
-                                    width: 16.w,
-                                    height: 16.w,
-                                    child: const CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
-                                  )
-                                : Text("APPLY", style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                        onPressed: _removeCoupon,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.redAccent,
+                          textStyle: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
                           ),
                         ),
+                        child: const Text("REMOVE"),
+                      )
+                      : Container(
+                        height: 38.h,
+                        child: ElevatedButton(
+                          onPressed: _isCouponVerifying ? null : _verifyCoupon,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.black,
+                            disabledBackgroundColor: AppColors.primary
+                                .withOpacity(0.3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            elevation: 0,
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          ),
+                          child:
+                              _isCouponVerifying
+                                  ? SizedBox(
+                                    width: 16.w,
+                                    height: 16.w,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : Text(
+                                    "APPLY",
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                        ),
+                      ),
                 ],
               ),
               if (_couponError != null) ...[
                 SizedBox(height: 8.h),
                 Text(
                   _couponError!,
-                  style: TextStyle(color: Colors.redAccent, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
               if (_couponSuccessMessage != null) ...[
                 SizedBox(height: 8.h),
                 Text(
                   _couponSuccessMessage!,
-                  style: TextStyle(color: Colors.greenAccent, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ],
@@ -585,12 +818,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         onPressed: _processBooking,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
           elevation: 0,
         ),
         child: Text(
           _paymentMethod == 'online' ? "PAY & CONFIRM" : "CONFIRM BOOKING",
-          style: TextStyle(color: Colors.black, fontSize: 16.sp, fontWeight: FontWeight.bold, letterSpacing: 1),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
         ),
       ),
     );
