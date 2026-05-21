@@ -248,17 +248,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       StatefulBuilder(
         builder: (context, setModalState) {
           return Container(
-            padding: EdgeInsets.only(
-              left: 24.w,
-              right: 24.w,
-              top: 24.h,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
             decoration: const BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
             ),
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: 24.w,
+                right: 24.w,
+                top: 24.h,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+              ),
               child: Form(
                 key: _addressFormKey,
                 child: Column(
@@ -449,69 +452,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setModalState(() => _isLoading = false);
         setState(() => _isLoading = false);
       }
-    }
-  }
-
-  void _confirmDeleteAddress(int id) {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(
-          "Delete Address?",
-          style: TextStyle(color: Colors.white, fontFamily: 'Playfair Display', fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          "Are you sure you want to remove this saved address? This action cannot be undone.",
-          style: TextStyle(color: Colors.white70, fontSize: 13.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              _deleteAddress(id);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: const Text("Delete", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteAddress(int id) async {
-    setState(() => _isFetchingAddresses = true);
-    try {
-      final response = await _apiService.dio.delete('/profile/addresses/$id');
-      if (response.data['status'] == 'success') {
-        Get.snackbar(
-          "Success",
-          "Address deleted successfully",
-          backgroundColor: AppColors.surface,
-          colorText: Colors.white,
-        );
-        _fetchAddresses();
-      } else {
-        Get.snackbar(
-          "Error",
-          response.data['message'] ?? "Failed to delete address",
-          backgroundColor: Colors.redAccent,
-          colorText: Colors.white,
-        );
-        setState(() => _isFetchingAddresses = false);
-      }
-    } catch (e) {
-      debugPrint("Error deleting address: $e");
-      Get.snackbar(
-        "Error",
-        "Failed to delete address from server",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
-      setState(() => _isFetchingAddresses = false);
     }
   }
 
@@ -883,13 +823,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () => _showAddressFormSheet(address),
                       icon: Icon(Icons.edit_outlined, size: 14.sp, color: AppColors.primary),
                       label: Text("Edit", style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
-                    ),
-                    SizedBox(width: 16.w),
-                    TextButton.icon(
-                      onPressed: () => _confirmDeleteAddress(address['id']),
-                      icon: Icon(Icons.delete_outline, size: 14.sp, color: Colors.redAccent),
-                      label: Text("Remove", style: TextStyle(color: Colors.redAccent, fontSize: 12.sp, fontWeight: FontWeight.bold)),
                       style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
                     ),
                   ],
