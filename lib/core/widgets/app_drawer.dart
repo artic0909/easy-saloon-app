@@ -10,47 +10,57 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
-    final userName = authService.userData['name'] ?? 'User';
 
     return Drawer(
       backgroundColor: AppColors.background,
       child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(top: 60.h, left: 24.w, right: 24.w, bottom: 24.h),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: Border(bottom: BorderSide(color: AppColors.primary.withValues(alpha: 0.1))),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+          Obx(() {
+            final userData = authService.userData;
+            final userName = userData['name'] ?? 'User';
+            final photoUrl = userData['photo'];
+
+            return Container(
+              padding: EdgeInsets.only(top: 60.h, left: 24.w, right: 24.w, bottom: 24.h),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                border: Border(bottom: BorderSide(color: AppColors.primary.withValues(alpha: 0.1))),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: AppColors.primary,
+                    backgroundImage: photoUrl != null
+                        ? NetworkImage("https://test.sumatrasales.com/storage/$photoUrl")
+                        : null,
+                    child: photoUrl == null
+                        ? Text(
+                            userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+                          )
+                        : null,
                   ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  "Hey, $userName",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.sp,
-                    fontFamily: 'Playfair Display',
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 16.h),
+                  Text(
+                    "Hey, $userName",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.sp,
+                      fontFamily: 'Playfair Display',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  "Welcome back to luxury",
-                  style: TextStyle(color: Colors.white54, fontSize: 12.sp),
-                ),
-              ],
-            ),
-          ),
+                  Text(
+                    "Welcome back to luxury",
+                    style: TextStyle(color: Colors.white54, fontSize: 12.sp),
+                  ),
+                ],
+              ),
+            );
+          }),
           Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 8.h),

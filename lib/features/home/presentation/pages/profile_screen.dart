@@ -239,7 +239,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _cityController.text = isEdit ? (address['city']?['name'] ?? '') : '';
     _stateController.text = isEdit ? (address['state']?['name'] ?? '') : '';
     _countryController.text = isEdit ? (address['country']?['name'] ?? '') : '';
-    _isPrimaryAddress = isEdit ? (address['is_primary'] == 1 || address['is_primary'] == true) : false;
+    _isPrimaryAddress = isEdit ? (address['is_primary'] == 1 ||
+                                  address['is_primary'] == true ||
+                                  address['is_primary']?.toString() == '1' ||
+                                  address['is_primary']?.toString() == 'true') : false;
 
     Get.bottomSheet(
       StatefulBuilder(
@@ -791,7 +794,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildAddressCard(dynamic address) {
-    final bool isPrimary = address['is_primary'] == 1 || address['is_primary'] == true;
+    final bool isPrimary = address['is_primary'] == 1 ||
+                           address['is_primary'] == true ||
+                           address['is_primary']?.toString() == '1' ||
+                           address['is_primary']?.toString() == 'true';
     final String title = address['title'] ?? 'Address';
     final String fullAddress = address['full_address'] ?? '';
     final String cityName = address['city']?['name'] ?? '';
