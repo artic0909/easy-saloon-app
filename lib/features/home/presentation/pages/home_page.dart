@@ -156,6 +156,8 @@ class _HomePageState extends State<HomePage> {
             Get.toNamed('/services');
           } else if (index == 2) {
             Get.toNamed('/packages');
+          } else if (index == 1) {
+            Get.toNamed('/my-bookings');
           } else {
             setState(() => _currentIndex = index);
           }

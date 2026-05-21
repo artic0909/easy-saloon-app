@@ -102,7 +102,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
           } else if (index == 0) {
             Get.offAllNamed('/home');
           } else if (index == 1) {
-            // Bookings
+            Get.offNamed('/my-bookings');
           } else if (index == 3) {
             Get.offNamed('/services');
           }

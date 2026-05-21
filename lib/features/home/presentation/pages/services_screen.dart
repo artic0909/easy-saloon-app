@@ -129,7 +129,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           } else if (index == 0) {
             Get.offAllNamed('/home');
           } else if (index == 1) {
-            // Bookings (not implemented yet)
+            Get.offNamed('/my-bookings');
           } else if (index == 2) {
             Get.offNamed('/packages');
           }
