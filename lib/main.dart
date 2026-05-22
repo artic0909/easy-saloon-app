@@ -18,7 +18,12 @@ import 'package:easysaloonapp/features/home/presentation/pages/custom_package_sc
 import 'package:easysaloonapp/features/home/presentation/pages/checkout_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/bookings/mybookings.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/bookings/booking_details.dart';
-import 'package:easysaloonapp/features/dashboard/presentation/pages/staff_dashboard.dart';
+import 'package:easysaloonapp/features/staff/dashboard.dart';
+import 'package:easysaloonapp/features/staff/bookings/upcoming.dart';
+import 'package:easysaloonapp/features/staff/bookings/pending.dart';
+import 'package:easysaloonapp/features/staff/bookings/complete.dart';
+import 'package:easysaloonapp/features/staff/bookings/cancel.dart';
+import 'package:easysaloonapp/features/staff/bookings/booking_details.dart';
 import 'package:easysaloonapp/features/dashboard/presentation/pages/admin_dashboard.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
@@ -61,6 +66,11 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/my-bookings', page: () => const MyBookingsPage()),
             GetPage(name: '/booking-details', page: () => const BookingDetailsPage()),
             GetPage(name: '/staff-dashboard', page: () => const StaffDashboard()),
+            GetPage(name: '/staff-bookings-upcoming', page: () => const StaffUpcomingBookingsPage()),
+            GetPage(name: '/staff-bookings-pending', page: () => const StaffPendingBookingsPage()),
+            GetPage(name: '/staff-bookings-complete', page: () => const StaffCompleteBookingsPage()),
+            GetPage(name: '/staff-bookings-cancel', page: () => const StaffCancelBookingsPage()),
+            GetPage(name: '/staff-booking-details', page: () => const StaffBookingDetailsPage()),
             GetPage(name: '/admin-dashboard', page: () => const AdminDashboard()),
           ],
         );

@@ -4,8 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
-import 'package:easysaloonapp/core/widgets/staff_drawer.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
+import 'package:easysaloonapp/features/staff/widgets/staff_drawer.dart';
+import 'package:easysaloonapp/features/staff/bookings/pending.dart';
+import 'package:easysaloonapp/features/staff/bookings/complete.dart';
 
 class StaffDashboard extends StatefulWidget {
   const StaffDashboard({super.key});
@@ -28,6 +30,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
   List<dynamic> _todayBookings = [];
   bool _isLoading = true;
 
+  // Report fields
+  double _totalEarnings = 0.0;
+  int _paidCount = 0;
+  int _unpaidCount = 0;
+  bool _isLoadingReports = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,19 +43,57 @@ class _StaffDashboardState extends State<StaffDashboard> {
   }
 
   Future<void> _fetchDashboardData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final response = await _apiService.dio.get('/staff/dashboard');
       if (response.data['status'] == 'success') {
+        if (!mounted) return;
         setState(() {
           _stats = Map<String, dynamic>.from(response.data['data']['stats']);
-          _todayBookings = response.data['data']['today_bookings'];
+          _todayBookings = response.data['data']['today_bookings'] ?? [];
           _isLoading = false;
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
       debugPrint("Error fetching staff dashboard: $e");
+    }
+  }
+
+  Future<void> _fetchReportsData() async {
+    if (!mounted) return;
+    setState(() => _isLoadingReports = true);
+    try {
+      final response = await _apiService.dio.get('/staff/completed-bookings');
+      if (response.data['status'] == 'success') {
+        final List<dynamic> completedList = response.data['data'] ?? [];
+        double earnings = 0.0;
+        int paid = 0;
+        int unpaid = 0;
+        for (var booking in completedList) {
+          final amt = double.tryParse(booking['payable_amount']?.toString() ?? booking['total_price']?.toString() ?? '0') ?? 0.0;
+          earnings += amt;
+          final isPaid = booking['is_paid'] == true || booking['is_paid'] == 1 || booking['is_paid'] == '1';
+          if (isPaid) {
+            paid++;
+          } else {
+            unpaid++;
+          }
+        }
+        if (!mounted) return;
+        setState(() {
+          _totalEarnings = earnings;
+          _paidCount = paid;
+          _unpaidCount = unpaid;
+          _isLoadingReports = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingReports = false);
+      debugPrint("Error fetching reports data: $e");
     }
   }
 
@@ -55,9 +101,9 @@ class _StaffDashboardState extends State<StaffDashboard> {
   Widget build(BuildContext context) {
     final pages = [
       _buildDashboardContent(),
-      _buildPlaceholder("Staff Bookings"),
-      _buildPlaceholder("Complete Services"),
-      _buildPlaceholder("Earnings Report"),
+      const StaffPendingBookingsPage(embed: true),
+      const StaffCompleteBookingsPage(embed: true),
+      _buildReportsContent(),
     ];
 
     return Scaffold(
@@ -68,7 +114,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          _currentIndex == 0 ? "Staff Dashboard" : _getPageTitle(),
+          _getPageTitle(),
           style: TextStyle(fontFamily: 'Playfair Display', fontSize: 22.sp, color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -77,13 +123,25 @@ class _StaffDashboardState extends State<StaffDashboard> {
         ),
         actions: [
           IconButton(
-            onPressed: _fetchDashboardData,
+            onPressed: () {
+              if (_currentIndex == 0) {
+                _fetchDashboardData();
+              } else if (_currentIndex == 3) {
+                _fetchReportsData();
+              }
+            },
             icon: const Icon(Icons.refresh, color: Colors.white),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _fetchDashboardData,
+        onRefresh: () async {
+          if (_currentIndex == 0) {
+            await _fetchDashboardData();
+          } else if (_currentIndex == 3) {
+            await _fetchReportsData();
+          }
+        },
         color: AppColors.primary,
         child: pages[_currentIndex],
       ),
@@ -96,7 +154,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
       case 1: return "My Bookings";
       case 2: return "Completed";
       case 3: return "Reports";
-      default: return "Dashboard";
+      default: return "Staff Dashboard";
     }
   }
 
@@ -114,14 +172,13 @@ class _StaffDashboardState extends State<StaffDashboard> {
           _buildWelcomeHeader(),
           SizedBox(height: 24.h),
           
-          // Stats Grid - Increased childAspectRatio to fix overflow
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
             mainAxisSpacing: 16.h,
             crossAxisSpacing: 16.w,
-            childAspectRatio: 1.1, // Fixed from 1.4 to provide more vertical space
+            childAspectRatio: 1.1,
             children: [
               _buildGlassStatCard(_stats['total_bookings'].toString(), "Total Bookings", Icons.inventory_2_outlined, Colors.orange),
               _buildGlassStatCard(_stats['pending_bookings'].toString(), "Pending Tasks", Icons.access_time, Colors.blue),
@@ -213,7 +270,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
         ),
         child: Column(
           children: [
-            Icon(Icons.calendar_month, color: Colors.white10, size: 48),
+            const Icon(Icons.calendar_month, color: Colors.white10, size: 48),
             SizedBox(height: 12.h),
             Text("No bookings for today", style: TextStyle(color: Colors.white38, fontSize: 12.sp)),
           ],
@@ -240,32 +297,38 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : 16.h),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            child: const Icon(Icons.person, color: AppColors.primary, size: 20),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(clientName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
-                Text("$services • $time", style: TextStyle(color: Colors.white38, fontSize: 11.sp), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
+      child: InkWell(
+        onTap: () async {
+          await Get.toNamed('/staff-booking-details', arguments: booking);
+          _fetchDashboardData();
+        },
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              child: const Icon(Icons.person, color: AppColors.primary, size: 20),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: _getStatusColor(status).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(clientName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                  Text("$services • $time", style: TextStyle(color: Colors.white38, fontSize: 11.sp), maxLines: 1, overflow: TextOverflow.ellipsis),
+                ],
+              ),
             ),
-            child: Text(status.toUpperCase(), style: TextStyle(color: _getStatusColor(status), fontSize: 9.sp, fontWeight: FontWeight.bold)),
-          ),
-        ],
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: _getStatusColor(status).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(status.toUpperCase(), style: TextStyle(color: _getStatusColor(status), fontSize: 9.sp, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -280,14 +343,125 @@ class _StaffDashboardState extends State<StaffDashboard> {
     }
   }
 
+  Widget _buildReportsContent() {
+    if (_isLoadingReports) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+    }
+
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.all(20.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Earnings & Performance",
+            style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
+          ),
+          Text(
+            "Overview of your completed tasks",
+            style: TextStyle(color: Colors.white38, fontSize: 12.sp),
+          ),
+          SizedBox(height: 24.h),
+
+          // Total Earnings Card
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primary.withValues(alpha: 0.15), Colors.transparent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("TOTAL EARNINGS", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    Icon(Icons.wallet, color: AppColors.primary, size: 24.sp),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  "₹${_totalEarnings.toStringAsFixed(2)}",
+                  style: TextStyle(color: Colors.white, fontSize: 32.sp, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.h),
+
+          // Secondary Statistics Card
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("PAID JOBS", style: TextStyle(color: Colors.white30, fontSize: 9.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 6.h),
+                      Text(
+                        _paidCount.toString(),
+                        style: TextStyle(color: Colors.greenAccent, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("UNPAID JOBS", style: TextStyle(color: Colors.white30, fontSize: 9.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 6.h),
+                      Text(
+                        _unpaidCount.toString(),
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomNav() {
     return BottomNavigationBar(
-      currentIndex: _currentIndex >= 4 ? 0 : _currentIndex,
+      currentIndex: _currentIndex,
       onTap: (index) {
         if (index == 4) {
           _scaffoldKey.currentState?.openDrawer();
         } else {
-           setState(() => _currentIndex = index);
+          setState(() => _currentIndex = index);
+          if (index == 3) {
+            _fetchReportsData();
+          }
         }
       },
       backgroundColor: AppColors.background,
@@ -303,20 +477,6 @@ class _StaffDashboardState extends State<StaffDashboard> {
         BottomNavigationBarItem(icon: Icon(Icons.bar_chart), activeIcon: Icon(Icons.bar_chart), label: 'Report'),
         BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
       ],
-    );
-  }
-
-  Widget _buildPlaceholder(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.construction, size: 64, color: AppColors.primary.withValues(alpha: 0.3)),
-          SizedBox(height: 16.h),
-          Text(title, style: TextStyle(color: Colors.white, fontSize: 20.sp, fontFamily: 'Playfair Display')),
-          Text("Module Under Development", style: TextStyle(color: Colors.white38, fontSize: 12.sp)),
-        ],
-      ),
     );
   }
 }

@@ -55,10 +55,38 @@ class StaffDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 8.h),
               children: [
-                _buildDrawerItem(Icons.today, "My Today's Bookings", () => Get.back()),
-                _buildDrawerItem(Icons.pending_actions, "Pending Bookings", () => Get.back()),
-                _buildDrawerItem(Icons.cancel_outlined, "Canceled Bookings", () => Get.back()),
-                _buildDrawerItem(Icons.check_circle_outline, "Complete Bookings", () => Get.back()),
+                _buildDrawerItem(
+                  Icons.today, 
+                  "My Today's Bookings", 
+                  () {
+                    Get.back();
+                    Get.toNamed('/staff-bookings-upcoming');
+                  },
+                ),
+                _buildDrawerItem(
+                  Icons.pending_actions, 
+                  "Pending Bookings", 
+                  () {
+                    Get.back();
+                    Get.toNamed('/staff-bookings-pending');
+                  },
+                ),
+                _buildDrawerItem(
+                  Icons.cancel_outlined, 
+                  "Canceled Bookings", 
+                  () {
+                    Get.back();
+                    Get.toNamed('/staff-bookings-cancel');
+                  },
+                ),
+                _buildDrawerItem(
+                  Icons.check_circle_outline, 
+                  "Complete Bookings", 
+                  () {
+                    Get.back();
+                    Get.toNamed('/staff-bookings-complete');
+                  },
+                ),
                 const Divider(color: Colors.white10),
                 _buildDrawerItem(Icons.help_outline, "Help & Support", () => Get.back()),
                 _buildDrawerItem(Icons.settings_outlined, "Settings", () => Get.back()),
