@@ -38,7 +38,12 @@ class _StaffCancelBookingsPageState extends State<StaffCancelBookingsPage> {
       if (response.data['status'] == 'success') {
         if (!mounted) return;
         setState(() {
-          _bookings = response.data['data'] ?? [];
+          final rawData = response.data['data'];
+          if (rawData is Map && rawData.containsKey('data')) {
+            _bookings = rawData['data'] ?? [];
+          } else {
+            _bookings = rawData ?? [];
+          }
           _isLoading = false;
         });
       }

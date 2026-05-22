@@ -68,7 +68,15 @@ class _StaffDashboardState extends State<StaffDashboard> {
     try {
       final response = await _apiService.dio.get('/staff/completed-bookings');
       if (response.data['status'] == 'success') {
-        final List<dynamic> completedList = response.data['data'] ?? [];
+        final rawData = response.data['data'];
+        final List<dynamic> completedList;
+        if (rawData is Map && rawData.containsKey('data')) {
+          completedList = rawData['data'] ?? [];
+        } else if (rawData is List) {
+          completedList = rawData;
+        } else {
+          completedList = [];
+        }
         double earnings = 0.0;
         int paid = 0;
         int unpaid = 0;
