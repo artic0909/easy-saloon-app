@@ -5,17 +5,16 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:easysaloonapp/features/staff/widgets/staff_drawer.dart';
 import 'package:intl/intl.dart';
-import 'package:dio/dio.dart' as dio_pkg;
 
-class StaffUpcomingBookingsPage extends StatefulWidget {
+class StaffTodayBookingsPage extends StatefulWidget {
   final bool embed;
-  const StaffUpcomingBookingsPage({super.key, this.embed = false});
+  const StaffTodayBookingsPage({super.key, this.embed = false});
 
   @override
-  State<StaffUpcomingBookingsPage> createState() => _StaffUpcomingBookingsPageState();
+  State<StaffTodayBookingsPage> createState() => _StaffTodayBookingsPageState();
 }
 
-class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
+class _StaffTodayBookingsPageState extends State<StaffTodayBookingsPage> {
   final ApiService _apiService = ApiService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   
@@ -26,14 +25,16 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUpcomingBookings();
+    _fetchTodayBookings();
   }
 
-  Future<void> _fetchUpcomingBookings() async {
+  Future<void> _fetchTodayBookings() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      final response = await _apiService.dio.get('/staff/bookings', queryParameters: {
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final response = await _apiService.dio.get('/staff/pending-bookings', queryParameters: {
+        'date': todayStr,
         if (_searchQuery.isNotEmpty) 'search': _searchQuery,
       });
       if (response.data['status'] == 'success') {
@@ -51,56 +52,8 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      Get.snackbar("Error", "Failed to load open bookings",
+      Get.snackbar("Error", "Failed to load today's tasks",
           backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
-    }
-  }
-
-  Future<void> _acceptBooking(dynamic booking) async {
-    final confirmed = await Get.dialog<bool>(
-      AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const Text("Accept Booking?", style: TextStyle(color: Colors.white, fontFamily: 'Playfair Display')),
-        content: const Text("Do you want to accept this task?", style: TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text("No", style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            onPressed: () => Get.back(result: true),
-            child: const Text("Accept", style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      if (!mounted) return;
-      setState(() => _isLoading = true);
-      try {
-        final id = booking['id'];
-        final bookingType = booking['booking_type'] ?? 'regular';
-        final path = bookingType == 'custom' 
-            ? '/staff/custom-bookings/$id/status' 
-            : '/staff/bookings/$id/status';
-
-        final response = await _apiService.dio.post(path, data: {'status': 'Accepted'});
-        if (response.data['status'] == 'success') {
-          Get.snackbar("Success", "Task accepted successfully!",
-              backgroundColor: const Color(0xFF2E7D32), colorText: Colors.white);
-          _fetchUpcomingBookings();
-        }
-      } catch (e) {
-        setState(() => _isLoading = false);
-        String message = "Failed to accept booking";
-        if (e is dio_pkg.DioException && e.response?.data != null) {
-          message = e.response!.data['message'] ?? message;
-        }
-        Get.snackbar("Error", message,
-            backgroundColor: const Color(0xFFC62828), colorText: Colors.white);
-      }
     }
   }
 
@@ -114,6 +67,15 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
     }
   }
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'accepted': return Colors.blue;
+      case 'on_the_way': return Colors.indigoAccent;
+      case 'started': return Colors.amber;
+      default: return AppColors.primary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bodyContent = Column(
@@ -121,7 +83,7 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
         _buildSearchField(),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: _fetchUpcomingBookings,
+            onRefresh: _fetchTodayBookings,
             color: AppColors.primary,
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
@@ -145,7 +107,7 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          "Open Bookings",
+          "My Today's Bookings",
           style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20.sp, color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -164,11 +126,10 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
         style: const TextStyle(color: Colors.white),
         onChanged: (val) {
           setState(() => _searchQuery = val);
-          // Wait a bit and search
-          _fetchUpcomingBookings();
+          _fetchTodayBookings();
         },
         decoration: InputDecoration(
-          hintText: "Search tasks...",
+          hintText: "Search today's tasks...",
           hintStyle: const TextStyle(color: Colors.white30),
           prefixIcon: const Icon(Icons.search, color: Colors.white30),
           filled: true,
@@ -205,6 +166,7 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
     final slotStr = booking['time_slot']?.toString() ?? '';
     final serviceType = booking['service_type']?.toString() == 'home' ? 'Home Service' : 'Salon Visit';
     final payableAmount = double.tryParse(booking['payable_amount']?.toString() ?? booking['total_price']?.toString() ?? '0') ?? 0.0;
+    final status = booking['status']?.toString() ?? 'pending';
     
     // Items
     final bookingType = booking['booking_type'] ?? 'regular';
@@ -229,9 +191,16 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
                 "#$bookingNumber",
                 style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5),
               ),
-              Text(
-                serviceType,
-                style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(status).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Text(
+                  status.toUpperCase(),
+                  style: TextStyle(color: _getStatusColor(status), fontSize: 9.sp, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -249,7 +218,7 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "$itemsCount items • ₹${payableAmount.toStringAsFixed(0)}",
+                    "$itemsCount items • ₹${payableAmount.toStringAsFixed(0)} • $serviceType",
                     style: TextStyle(color: Colors.white38, fontSize: 12.sp),
                   ),
                 ],
@@ -258,7 +227,7 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
                 icon: const Icon(Icons.arrow_forward_ios, color: AppColors.primary, size: 16),
                 onPressed: () async {
                   await Get.toNamed('/staff-booking-details', arguments: booking);
-                  _fetchUpcomingBookings();
+                  _fetchTodayBookings();
                 },
               ),
             ],
@@ -276,21 +245,6 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
               Text(slotStr, style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
             ],
           ),
-          SizedBox(height: 16.h),
-
-          // Accept button
-          SizedBox(
-            width: double.infinity,
-            height: 40.h,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-              ),
-              onPressed: () => _acceptBooking(booking),
-              child: Text("Accept Task", style: TextStyle(color: Colors.black, fontSize: 12.sp, fontWeight: FontWeight.bold)),
-            ),
-          ),
         ],
       ),
     );
@@ -302,16 +256,16 @@ class _StaffUpcomingBookingsPageState extends State<StaffUpcomingBookingsPage> {
         shrinkWrap: true,
         padding: EdgeInsets.all(32.w),
         children: [
-          Icon(Icons.task_alt, size: 64.w, color: Colors.white24),
+          Icon(Icons.today, size: 64.w, color: Colors.white24),
           SizedBox(height: 16.h),
           Text(
-            "No Open Tasks",
+            "No Bookings Today",
             textAlign: TextAlign.center,
             style: TextStyle(fontFamily: 'Playfair Display', fontSize: 18.sp, color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 8.h),
           Text(
-            "All tasks are currently assigned or completed.",
+            "You don't have any bookings scheduled for today.",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white38, fontSize: 12.sp),
           ),

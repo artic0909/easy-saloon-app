@@ -432,6 +432,27 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                           ),
                         ] else if (status.toLowerCase() != 'completed' && status.toLowerCase() != 'cancelled') ...[
                           // Dynamic workflow based on status
+                          if (status.toLowerCase() == 'pending' || status.toLowerCase() == 'confirmed') ...[
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48.h,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                                onPressed: () => _updateStatus('Accepted'),
+                                child: Text("Accept Task", style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48.h,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                                onPressed: () => _updateStatus('On the way'),
+                                child: Text("Start Travel (On the Way)", style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
                           if (status.toLowerCase() == 'accepted')
                             SizedBox(
                               width: double.infinity,
@@ -442,18 +463,8 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                                 child: Text("Start Travel (On the Way)", style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)),
                               ),
                             ),
-                          if (status.toLowerCase() == 'on_the_way')
-                            SizedBox(
-                              width: double.infinity,
-                              height: 48.h,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-                                onPressed: () => _updateStatus('Started'),
-                                child: Text("Start Service", style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          if (status.toLowerCase() == 'started') ...[
-                            if (!isOtpVerified) ...[
+                          if (status.toLowerCase() == 'on_the_way') ...[
+                            if (!isOtpVerified && _booking['otp'] != null) ...[
                               Text("SECURITY OTP VERIFICATION REQUIRED", style: TextStyle(color: Colors.redAccent, fontSize: 9.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                               SizedBox(height: 8.h),
                               Row(
@@ -485,29 +496,54 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                                   ),
                                 ],
                               ),
-                            ] else ...[
-                              Container(
-                                padding: EdgeInsets.all(12.w),
-                                margin: EdgeInsets.only(bottom: 16.h),
-                                decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12.r)),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.verified, color: Colors.green),
-                                    SizedBox(width: 8.w),
-                                    Text("OTP Verified Successfully", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12.sp)),
-                                  ],
-                                ),
-                              ),
+                              SizedBox(height: 16.h),
                               SizedBox(
                                 width: double.infinity,
                                 height: 48.h,
                                 child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
-                                  onPressed: () => _updateStatus('Completed'),
-                                  child: Text("Complete Service", style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade800),
+                                  onPressed: () {
+                                    Get.snackbar("OTP Required", "Please verify the customer's OTP to start the service.",
+                                        backgroundColor: Colors.amber.withOpacity(0.9), colorText: Colors.black);
+                                  },
+                                  child: Text("Start Service (Requires OTP)", style: TextStyle(color: Colors.white30, fontSize: 14.sp, fontWeight: FontWeight.bold)),
                                 ),
                               ),
-                            ]
+                            ] else ...[
+                              if (_booking['otp'] != null)
+                                Container(
+                                  padding: EdgeInsets.all(12.w),
+                                  margin: EdgeInsets.only(bottom: 16.h),
+                                  decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12.r)),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.verified, color: Colors.green),
+                                      SizedBox(width: 8.w),
+                                      Text("OTP Verified Successfully", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12.sp)),
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48.h,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                                  onPressed: () => _updateStatus('Started'),
+                                  child: Text("Start Service", style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ],
+                          ],
+                          if (status.toLowerCase() == 'started') ...[
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48.h,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
+                                onPressed: () => _updateStatus('Completed'),
+                                child: Text("Complete Service", style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
                           ],
                           
                           SizedBox(height: 12.h),
@@ -528,6 +564,66 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                       ],
                     ),
             ),
+            if (status.toLowerCase() == 'completed') ...[
+              SizedBox(height: 24.h),
+              Text("CUSTOMER RATING", style: TextStyle(color: Colors.white54, fontSize: 11.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              SizedBox(height: 10.h),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.15)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _booking['rating'] != null ? "Service Rated" : "Not Rated Yet",
+                            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            _booking['rating'] != null ? "Customer provided a rating for this service" : "Customer hasn't rated this visit yet",
+                            style: TextStyle(color: Colors.white38, fontSize: 11.sp),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_booking['rating'] != null) ...[
+                      Row(
+                        children: [
+                          Row(
+                            children: List.generate(5, (index) {
+                              final r = int.tryParse(_booking['rating'].toString()) ?? 0;
+                              return Icon(
+                                index < r ? Icons.star : Icons.star_border,
+                                color: index < r ? Colors.amber : Colors.white24,
+                                size: 16.w,
+                              );
+                            }),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "${_booking['rating']}.0",
+                            style: TextStyle(color: Colors.amber, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        children: List.generate(5, (index) => Icon(Icons.star_border, color: Colors.white24, size: 16.w)),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
             SizedBox(height: 24.h),
 
             // Service Address (If Home Booking)

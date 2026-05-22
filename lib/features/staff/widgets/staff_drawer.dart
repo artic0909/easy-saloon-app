@@ -56,11 +56,19 @@ class StaffDrawer extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 8.h),
               children: [
                 _buildDrawerItem(
+                  Icons.lock_open, 
+                  "Open Bookings", 
+                  () {
+                    Get.back();
+                    Get.toNamed('/staff-bookings-upcoming');
+                  },
+                ),
+                _buildDrawerItem(
                   Icons.today, 
                   "My Today's Bookings", 
                   () {
                     Get.back();
-                    Get.toNamed('/staff-bookings-upcoming');
+                    Get.toNamed('/staff-bookings-today');
                   },
                 ),
                 _buildDrawerItem(

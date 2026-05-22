@@ -161,6 +161,9 @@ class _StaffCompleteBookingsPageState extends State<StaffCompleteBookingsPage> {
     final itemsCount = bookingType == 'custom' 
         ? (booking['services'] as List?)?.length ?? 0
         : (booking['items'] as List?)?.length ?? 0;
+        
+    final ratingVal = booking['rating'];
+    final int? rating = ratingVal != null ? int.tryParse(ratingVal.toString()) : null;
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -197,19 +200,44 @@ class _StaffCompleteBookingsPageState extends State<StaffCompleteBookingsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    booking['user']?['name'] ?? 'Guest Client',
-                    style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    "$itemsCount items • ₹${payableAmount.toStringAsFixed(0)} • $serviceType",
-                    style: TextStyle(color: Colors.white38, fontSize: 12.sp),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking['user']?['name'] ?? 'Guest Client',
+                      style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      "$itemsCount items • ₹${payableAmount.toStringAsFixed(0)} • $serviceType",
+                      style: TextStyle(color: Colors.white38, fontSize: 12.sp),
+                    ),
+                    SizedBox(height: 6.h),
+                    Row(
+                      children: [
+                        Row(
+                          children: List.generate(5, (index) {
+                            return Icon(
+                              index < (rating ?? 0) ? Icons.star : Icons.star_border,
+                              color: index < (rating ?? 0) ? Colors.amber : Colors.white24,
+                              size: 14.w,
+                            );
+                          }),
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          rating != null ? "($rating.0)" : "(No rating)",
+                          style: TextStyle(
+                            color: rating != null ? Colors.amber : Colors.white24, 
+                            fontSize: 10.sp,
+                            fontWeight: rating != null ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios, color: AppColors.primary, size: 16),
