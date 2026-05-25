@@ -991,15 +991,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ElevatedButton(
                       onPressed: isLoading ? null : () async {
                         if (_currentPasswordController.text.isEmpty || _newPasswordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
-                          Get.snackbar("Error", "All fields are required", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          Get.snackbar("Error", "Please fill in all password fields.", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          return;
+                        }
+                        if (_currentPasswordController.text == _newPasswordController.text) {
+                          Get.snackbar("Error", "New password cannot be the same as your current password.", backgroundColor: Colors.redAccent, colorText: Colors.white);
                           return;
                         }
                         if (_newPasswordController.text != _confirmPasswordController.text) {
-                          Get.snackbar("Error", "New passwords do not match", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          Get.snackbar("Error", "Confirm password does not match with the new password.", backgroundColor: Colors.redAccent, colorText: Colors.white);
                           return;
                         }
                         if (_newPasswordController.text.length < 8) {
-                          Get.snackbar("Error", "Password must be at least 8 characters", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          Get.snackbar("Error", "New password must be at least 8 characters long.", backgroundColor: Colors.redAccent, colorText: Colors.white);
                           return;
                         }
 
