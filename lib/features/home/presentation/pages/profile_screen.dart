@@ -36,6 +36,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
 
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   int _activeSegment = 0; // 0: Profile Settings, 1: Saved Addresses
   bool _isLoading = false;
   bool _isFetchingAddresses = true;
@@ -62,6 +66,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _cityController.dispose();
     _stateController.dispose();
     _countryController.dispose();
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -680,6 +687,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
               ),
             ),
+            SizedBox(height: 24.h),
+            TextButton(
+              onPressed: _showChangePasswordSheet,
+              child: Text(
+                "Change Password",
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14.sp),
+              ),
+            ),
           ],
         ),
       ),
@@ -914,6 +929,146 @@ class _ProfileScreenState extends State<ProfileScreen> {
               hintStyle: TextStyle(color: Colors.white24, fontSize: 14.sp),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showChangePasswordSheet() {
+    _currentPasswordController.clear();
+    _newPasswordController.clear();
+    _confirmPasswordController.clear();
+    
+    bool isLoading = false;
+    bool obscureCurrent = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: 24.w,
+                right: 24.w,
+                top: 24.h,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Change Password",
+                        style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white54),
+                        onPressed: () => Get.back(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  _buildPasswordField("Current Password", _currentPasswordController, obscureCurrent, () => setModalState(() => obscureCurrent = !obscureCurrent)),
+                  SizedBox(height: 16.h),
+                  _buildPasswordField("New Password", _newPasswordController, obscureNew, () => setModalState(() => obscureNew = !obscureNew)),
+                  SizedBox(height: 16.h),
+                  _buildPasswordField("Confirm New Password", _confirmPasswordController, obscureConfirm, () => setModalState(() => obscureConfirm = !obscureConfirm)),
+                  SizedBox(height: 32.h),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50.h,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : () async {
+                        if (_currentPasswordController.text.isEmpty || _newPasswordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
+                          Get.snackbar("Error", "All fields are required", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          return;
+                        }
+                        if (_newPasswordController.text != _confirmPasswordController.text) {
+                          Get.snackbar("Error", "New passwords do not match", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          return;
+                        }
+                        if (_newPasswordController.text.length < 8) {
+                          Get.snackbar("Error", "Password must be at least 8 characters", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          return;
+                        }
+
+                        setModalState(() => isLoading = true);
+                        try {
+                          final response = await _apiService.dio.post('/profile/change-password', data: {
+                            'current_password': _currentPasswordController.text,
+                            'new_password': _newPasswordController.text,
+                          });
+                          
+                          if (response.data['status'] == 'success') {
+                            Get.back();
+                            Get.snackbar("Success", response.data['message'], backgroundColor: AppColors.surface, colorText: Colors.white);
+                          } else {
+                            Get.snackbar("Error", response.data['message'], backgroundColor: Colors.redAccent, colorText: Colors.white);
+                          }
+                        } catch (e) {
+                          Get.snackbar("Error", "Failed to change password", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                        } finally {
+                          if (mounted) setModalState(() => isLoading = false);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: isLoading
+                          ? SizedBox(width: 20.w, height: 20.w, child: const CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                          : Text("Update Password", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15.sp)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildPasswordField(String label, TextEditingController controller, bool obscureText, VoidCallback toggleObscure) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          ),
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: "Enter $label",
+              hintStyle: TextStyle(color: Colors.white24, fontSize: 14.sp),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              suffixIcon: IconButton(
+                icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.white38),
+                onPressed: toggleObscure,
+              ),
             ),
           ),
         ),
