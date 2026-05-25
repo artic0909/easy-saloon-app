@@ -26,6 +26,11 @@ import 'package:easysaloonapp/features/staff/bookings/complete.dart';
 import 'package:easysaloonapp/features/staff/bookings/cancel.dart';
 import 'package:easysaloonapp/features/staff/bookings/booking_details.dart';
 import 'package:easysaloonapp/features/admin/dashboard.dart';
+import 'package:easysaloonapp/features/admin/bookings/open.dart';
+import 'package:easysaloonapp/features/admin/bookings/ontheway.dart';
+import 'package:easysaloonapp/features/admin/bookings/complete.dart';
+import 'package:easysaloonapp/features/admin/bookings/cancel.dart';
+import 'package:easysaloonapp/features/admin/bookings/booking_details.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 void main() async {
@@ -74,6 +79,11 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/staff-bookings-cancel', page: () => const StaffCancelBookingsPage()),
             GetPage(name: '/staff-booking-details', page: () => const StaffBookingDetailsPage()),
             GetPage(name: '/admin-dashboard', page: () => const AdminDashboard()),
+            GetPage(name: '/admin-bookings-open', page: () => const AdminOpenBookingsPage()),
+            GetPage(name: '/admin-bookings-ontheway', page: () => const AdminOnTheWayBookingsPage()),
+            GetPage(name: '/admin-bookings-complete', page: () => const AdminCompleteBookingsPage()),
+            GetPage(name: '/admin-bookings-cancel', page: () => const AdminCancelBookingsPage()),
+            GetPage(name: '/admin-booking-details', page: () => const AdminBookingDetailsPage()),
           ],
         );
       },
