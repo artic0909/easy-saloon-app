@@ -20,7 +20,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   
   // Booking selections
   String _serviceLocation = 'home';
-  List<String> _selectedEquipments = [];
+  final List<String> _selectedEquipments = [];
   DateTime _selectedDate = DateTime.now();
   String _selectedSlot = 'Morning';
   int _activeImageIndex = 0;
@@ -44,7 +44,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load service details", 
-          backgroundColor: Colors.red.withOpacity(0.7), colorText: Colors.white);
+          backgroundColor: Colors.red.withValues(alpha: 0.7), colorText: Colors.white);
     }
   }
 
@@ -142,9 +142,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.3),
+                Colors.black.withValues(alpha: 0.3),
                 Colors.transparent,
-                Colors.black.withOpacity(0.8),
+                Colors.black.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -163,7 +163,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   width: _activeImageIndex == index ? 16.w : 6.w,
                   height: 6.h,
                   decoration: BoxDecoration(
-                    color: _activeImageIndex == index ? AppColors.primary : Colors.white.withOpacity(0.4),
+                    color: _activeImageIndex == index ? AppColors.primary : Colors.white.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -174,7 +174,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           top: 50.h,
           left: 20.w,
           child: CircleAvatar(
-            backgroundColor: Colors.black.withOpacity(0.5),
+            backgroundColor: Colors.black.withValues(alpha: 0.5),
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Get.back(),
@@ -251,7 +251,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +276,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: const Icon(Icons.check, color: AppColors.primary, size: 14),
@@ -307,7 +307,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         borderRadius: BorderRadius.circular(40.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             blurRadius: 30,
             offset: const Offset(0, 20),
           )
@@ -346,7 +346,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.h),
-            child: Divider(color: Colors.white.withOpacity(0.05)),
+            child: Divider(color: Colors.white.withValues(alpha: 0.05)),
           ),
 
           // Location Choice
@@ -383,9 +383,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                      color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.1)),
                     ),
                     child: Text(
                       eq['name'],
@@ -431,9 +431,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -505,7 +505,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       child: Container(
         height: 80.h,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
@@ -526,7 +526,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(15.r),
         ),
         child: Center(

@@ -194,11 +194,11 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
         await launchUrl(uri);
       } else {
         Get.snackbar("Error", "Could not trigger phone call", 
-            backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+            backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
       }
     } catch (e) {
       Get.snackbar("Error", "Could not trigger phone call", 
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 
@@ -253,7 +253,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(24.r),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +264,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.12),
+                                color: AppColors.primary.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(15.r),
                               ),
                               child: Text(
@@ -345,7 +345,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(16.r),
-                            border: Border.all(color: AppColors.primary.withOpacity(0.08), width: 1),
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.08), width: 1),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,10 +371,10 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
                             decoration: BoxDecoration(
-                              color: isOtpVerified ? const Color(0xFF2E7D32).withOpacity(0.12) : AppColors.surface,
+                              color: isOtpVerified ? const Color(0xFF2E7D32).withValues(alpha: 0.12) : AppColors.surface,
                               borderRadius: BorderRadius.circular(16.r),
                               border: Border.all(
-                                color: isOtpVerified ? const Color(0xFF2E7D32).withOpacity(0.3) : AppColors.primary.withOpacity(0.08), 
+                                color: isOtpVerified ? const Color(0xFF2E7D32).withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.08), 
                                 width: 1,
                               ),
                             ),
@@ -435,7 +435,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.08), width: 1),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.08), width: 1),
                     ),
                     child: Row(
                       children: [
@@ -470,9 +470,9 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2E7D32).withOpacity(0.12),
+                              color: const Color(0xFF2E7D32).withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.3), width: 1),
+                              border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.3), width: 1),
                             ),
                             child: Row(
                               children: [
@@ -577,9 +577,9 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                       width: double.infinity,
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.06),
+                        color: AppColors.primary.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 1),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -597,7 +597,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                                 SizedBox(height: 4.h),
                                 Text(
                                   address['full_address']?.toString() ?? '',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.87), fontSize: 12.sp, height: 1.4),
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.87), fontSize: 12.sp, height: 1.4),
                                 ),
                                 if (address['landmark'] != null && address['landmark'].toString().isNotEmpty) ...[
                                   SizedBox(height: 4.h),
@@ -652,13 +652,13 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(16.r),
-                          border: Border.all(color: AppColors.primary.withOpacity(0.08), width: 1),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.08), width: 1),
                         ),
                         child: Row(
                           children: [
                             CircleAvatar(
                               radius: 20.r,
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                               backgroundImage: staff['photo'] != null
                                   ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
                                   : null,
@@ -708,7 +708,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
                       ),
                       child: Column(
                         children: [
@@ -755,7 +755,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
                     ),
                     child: Column(
                       children: [
@@ -781,7 +781,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text("Taxes & Fees", style: TextStyle(color: Colors.white54)),
-                            Text("₹0.00", style: TextStyle(color: Colors.white.withOpacity(0.5))),
+                            Text("₹0.00", style: TextStyle(color: Colors.white.withValues(alpha: 0.5))),
                           ],
                         ),
                         SizedBox(height: 16.h),

@@ -53,7 +53,7 @@ class _StaffTodayBookingsPageState extends State<StaffTodayBookingsPage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load today's tasks",
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 

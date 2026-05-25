@@ -22,7 +22,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   String _serviceLocation = 'home';
   DateTime _selectedDate = DateTime.now();
   String _selectedSlot = 'Morning';
-  List<String> _selectedEquipments = [];
+  final List<String> _selectedEquipments = [];
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load package details", 
-          backgroundColor: Colors.red.withOpacity(0.7), colorText: Colors.white);
+          backgroundColor: Colors.red.withValues(alpha: 0.7), colorText: Colors.white);
     }
   }
 
@@ -123,9 +123,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.3),
+                Colors.black.withValues(alpha: 0.3),
                 Colors.transparent,
-                Colors.black.withOpacity(0.8),
+                Colors.black.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -134,7 +134,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           top: 50.h,
           left: 20.w,
           child: CircleAvatar(
-            backgroundColor: Colors.black.withOpacity(0.5),
+            backgroundColor: Colors.black.withValues(alpha: 0.5),
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Get.back(),
@@ -206,7 +206,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +220,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: items.length,
-            separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 20.h),
+            separatorBuilder: (context, index) => Divider(color: Colors.white.withValues(alpha: 0.05), height: 20.h),
             itemBuilder: (context, index) {
               final service = items[index]['service'];
               if (service == null) return const SizedBox.shrink();
@@ -263,7 +263,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
         borderRadius: BorderRadius.circular(40.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             blurRadius: 30,
             offset: const Offset(0, 20),
           )
@@ -297,7 +297,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
           
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.h),
-            child: Divider(color: Colors.white.withOpacity(0.05)),
+            child: Divider(color: Colors.white.withValues(alpha: 0.05)),
           ),
 
           Text("CHOOSE SERVICE LOCATION", style: TextStyle(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.w900, letterSpacing: 1)),
@@ -346,9 +346,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -411,7 +411,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       child: Container(
         height: 80.h,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
@@ -432,7 +432,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(15.r),
         ),
         child: Center(
@@ -493,9 +493,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                        color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1)),
+                        border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.1)),
                       ),
                       child: Text(
                         eq['name'],
@@ -507,7 +507,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }

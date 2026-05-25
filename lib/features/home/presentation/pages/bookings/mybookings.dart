@@ -50,7 +50,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       Get.snackbar(
         "Error", 
         "Failed to load bookings",
-        backgroundColor: Colors.redAccent.withOpacity(0.8),
+        backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     }
@@ -189,11 +189,11 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         await launchUrl(uri);
       } else {
         Get.snackbar("Error", "Could not trigger phone call", 
-            backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+            backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
       }
     } catch (e) {
       Get.snackbar("Error", "Could not trigger phone call", 
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 
@@ -279,7 +279,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
           color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(25.r),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.primary.withOpacity(0.15),
+            color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -335,7 +335,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,9 +453,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(status).withOpacity(0.12),
+                    color: _getStatusColor(status).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: _getStatusColor(status).withOpacity(0.25), width: 1),
+                    border: Border.all(color: _getStatusColor(status).withValues(alpha: 0.25), width: 1),
                   ),
                   child: Text(
                     status.toUpperCase(),
@@ -471,7 +471,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: isPaid ? const Color(0xFF2E7D32).withOpacity(0.12) : const Color(0xFFC5A35C).withOpacity(0.12),
+                    color: isPaid ? const Color(0xFF2E7D32).withValues(alpha: 0.12) : const Color(0xFFC5A35C).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
@@ -514,7 +514,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                     children: [
                       CircleAvatar(
                         radius: 16.r,
-                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                         backgroundImage: staff['photo'] != null
                             ? NetworkImage("https://test.sumatrasales.com/storage/${staff['photo']}")
                             : null,

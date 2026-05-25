@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
-import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:dio/dio.dart';
@@ -101,7 +100,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Get.snackbar(
         "Warning",
         "Please enter a coupon code",
-        backgroundColor: Colors.amber.withOpacity(0.7),
+        backgroundColor: Colors.amber.withValues(alpha: 0.7),
       );
       return;
     }
@@ -168,7 +167,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Get.snackbar(
         "Error",
         "Please select an address for home service",
-        backgroundColor: Colors.red.withOpacity(0.7),
+        backgroundColor: Colors.red.withValues(alpha: 0.7),
       );
       return;
     }
@@ -217,7 +216,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Get.snackbar(
         "Error",
         "Booking failed",
-        backgroundColor: Colors.red.withOpacity(0.7),
+        backgroundColor: Colors.red.withValues(alpha: 0.7),
       );
     }
   }
@@ -258,7 +257,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Get.snackbar(
         "Payment Error",
         "Failed to initialize payment",
-        backgroundColor: Colors.red.withOpacity(0.7),
+        backgroundColor: Colors.red.withValues(alpha: 0.7),
       );
     }
   }
@@ -286,7 +285,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Get.snackbar(
         "Verification Failed",
         "Please contact support",
-        backgroundColor: Colors.red.withOpacity(0.7),
+        backgroundColor: Colors.red.withValues(alpha: 0.7),
       );
     }
   }
@@ -296,7 +295,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     Get.snackbar(
       "Payment Failed",
       response.message ?? "User cancelled",
-      backgroundColor: Colors.red.withOpacity(0.7),
+      backgroundColor: Colors.red.withValues(alpha: 0.7),
     );
   }
 
@@ -371,7 +370,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +475,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           )
         else
-          ..._addresses.map((addr) => _buildAddressItem(addr)).toList(),
+          ..._addresses.map((addr) => _buildAddressItem(addr)),
       ],
     );
   }
@@ -491,12 +490,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? AppColors.primary.withOpacity(0.05)
+                  ? AppColors.primary.withValues(alpha: 0.05)
                   : AppColors.surface,
           borderRadius: BorderRadius.circular(15.r),
           border: Border.all(
             color:
-                isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
           ),
         ),
         child: Row(
@@ -580,7 +579,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color:
-                isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+                isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
           ),
         ),
         child: Column(
@@ -630,7 +629,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Coupon Discount (${_appliedCouponCode})",
+                "Coupon Discount ($_appliedCouponCode)",
                 style: TextStyle(color: Colors.white54, fontSize: 14.sp),
               ),
               Text(
@@ -700,7 +699,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -744,7 +743,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                         child: const Text("REMOVE"),
                       )
-                      : Container(
+                      : SizedBox(
                         height: 38.h,
                         child: ElevatedButton(
                           onPressed: _isCouponVerifying ? null : _verifyCoupon,
@@ -752,7 +751,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.black,
                             disabledBackgroundColor: AppColors.primary
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),

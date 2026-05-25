@@ -51,7 +51,7 @@ class _StaffPendingBookingsPageState extends State<StaffPendingBookingsPage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load active tasks",
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 

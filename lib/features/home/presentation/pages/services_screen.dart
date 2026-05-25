@@ -145,7 +145,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
         child: TextField(
           style: const TextStyle(color: Colors.white),
@@ -184,7 +184,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
@@ -225,7 +225,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(

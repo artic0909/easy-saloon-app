@@ -51,7 +51,7 @@ class _StaffCancelBookingsPageState extends State<StaffCancelBookingsPage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       Get.snackbar("Error", "Failed to load canceled tasks",
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 

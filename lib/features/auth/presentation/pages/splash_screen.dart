@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
-import 'package:easysaloonapp/features/auth/presentation/pages/login_screen.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {

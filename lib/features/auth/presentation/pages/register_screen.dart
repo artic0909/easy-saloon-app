@@ -5,9 +5,7 @@ import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:easysaloonapp/core/widgets/salon_loader.dart';
-import 'package:lottie/lottie.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

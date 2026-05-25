@@ -220,11 +220,11 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
         await launchUrl(uri);
       } else {
         Get.snackbar("Error", "Could not launch dialer",
-            backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+            backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
       }
     } catch (e) {
       Get.snackbar("Error", "Could not launch dialer",
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 
@@ -235,11 +235,11 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
         await launchUrl(uri);
       } else {
         Get.snackbar("Error", "Could not open map launcher", 
-            backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+            backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
       }
     } catch (e) {
       Get.snackbar("Error", "Could not open map launcher", 
-          backgroundColor: Colors.redAccent.withOpacity(0.8), colorText: Colors.white);
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.8), colorText: Colors.white);
     }
   }
 
@@ -504,7 +504,7 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                                   style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade800),
                                   onPressed: () {
                                     Get.snackbar("OTP Required", "Please verify the customer's OTP to start the service.",
-                                        backgroundColor: Colors.amber.withOpacity(0.9), colorText: Colors.black);
+                                        backgroundColor: Colors.amber.withValues(alpha: 0.9), colorText: Colors.black);
                                   },
                                   child: Text("Start Service (Requires OTP)", style: TextStyle(color: Colors.white30, fontSize: 14.sp, fontWeight: FontWeight.bold)),
                                 ),
@@ -652,7 +652,7 @@ class _StaffBookingDetailsPageState extends State<StaffBookingDetailsPage> {
                             style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                           ),
                           SizedBox(height: 4.h),
-                          Text(address['full_address']?.toString() ?? '', style: TextStyle(color: Colors.white.withOpacity(0.87), fontSize: 12.sp, height: 1.4)),
+                          Text(address['full_address']?.toString() ?? '', style: TextStyle(color: Colors.white.withValues(alpha: 0.87), fontSize: 12.sp, height: 1.4)),
                           if (address['landmark'] != null && address['landmark'].toString().isNotEmpty) ...[
                             SizedBox(height: 4.h),
                             Text("Landmark: ${address['landmark']}", style: TextStyle(color: Colors.white54, fontSize: 11.sp)),

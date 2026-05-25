@@ -6,7 +6,6 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/widgets/salon_loader.dart';
-import 'package:lottie/lottie.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
