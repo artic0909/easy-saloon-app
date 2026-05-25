@@ -114,7 +114,13 @@ class _StaffDashboardState extends State<StaffDashboard> {
       _buildReportsContent(),
     ];
 
-    return Scaffold(
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        setState(() => _currentIndex = 0);
+      },
+      child: Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
       drawer: const StaffDrawer(),
@@ -154,7 +160,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
         child: pages[_currentIndex],
       ),
       bottomNavigationBar: _buildBottomNav(),
-    );
+    ));
   }
 
   String _getPageTitle() {

@@ -139,7 +139,13 @@ class _HomePageState extends State<HomePage> {
       _buildPlaceholderContent("Services"),
     ];
 
-    return Scaffold(
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        setState(() => _currentIndex = 0);
+      },
+      child: Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
@@ -160,7 +166,7 @@ class _HomePageState extends State<HomePage> {
           }
         },
       ),
-    );
+    ));
   }
 
   Widget _buildPlaceholderContent(String title) {
