@@ -25,7 +25,7 @@ import 'package:easysaloonapp/features/staff/bookings/today.dart';
 import 'package:easysaloonapp/features/staff/bookings/complete.dart';
 import 'package:easysaloonapp/features/staff/bookings/cancel.dart';
 import 'package:easysaloonapp/features/staff/bookings/booking_details.dart';
-import 'package:easysaloonapp/features/dashboard/presentation/pages/admin_dashboard.dart';
+import 'package:easysaloonapp/features/admin/dashboard.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 void main() async {
