@@ -332,22 +332,9 @@ class _WalletScreenState extends State<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recent Transactions",
-                style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
-              ),
-              if (_transactions.length > 5)
-                GestureDetector(
-                  onTap: () => Get.toNamed('/wallet-transactions'),
-                  child: Text(
-                    "View All",
-                    style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ],
+          Text(
+            "Recent Transactions",
+            style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
           ),
           SizedBox(height: 16.h),
           if (_transactions.isEmpty)
@@ -357,7 +344,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 child: Text("No transactions yet", style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
               ),
             )
-          else
+          else ...[
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -367,6 +354,21 @@ class _WalletScreenState extends State<WalletScreen> {
                 return _buildTransactionItem(_transactions[index]);
               },
             ),
+            SizedBox(height: 24.h),
+            SizedBox(
+              width: double.infinity,
+              height: 48.h,
+              child: OutlinedButton(
+                onPressed: () => Get.toNamed('/wallet-transactions'),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text("Show all transactions", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+              ),
+            ),
+            SizedBox(height: 40.h),
+          ],
         ],
       ),
     );
