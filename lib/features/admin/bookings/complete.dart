@@ -274,6 +274,23 @@ class _AdminCompleteBookingsPageState extends State<AdminCompleteBookingsPage> {
             ),
           ],
 
+          if (int.tryParse(booking['rating']?.toString() ?? '0') != null && int.parse(booking['rating']?.toString() ?? '0') > 0) ...[
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Text("Rating: ", style: TextStyle(color: Colors.white54, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+                ...List.generate(5, (index) {
+                  int rating = int.parse(booking['rating'].toString());
+                  return Icon(
+                    index < rating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 14.w,
+                  );
+                }),
+              ],
+            ),
+          ],
+
           SizedBox(height: 16.h),
           Row(
             children: [
