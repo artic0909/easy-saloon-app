@@ -132,6 +132,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
             Get.offNamed('/my-bookings');
           } else if (index == 2) {
             Get.offNamed('/packages');
+          } else if (index == 3) {
+            Get.offNamed('/categories');
           }
         },
       ),

@@ -79,7 +79,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          "Categories",
+          "Services",
           style: TextStyle(
             fontFamily: 'Playfair Display',
             fontSize: 20.sp,
@@ -117,7 +117,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           } else if (index == 2) {
             Get.offNamed('/packages');
           } else if (index == 3) {
-            Get.offNamed('/services');
+            Get.offNamed('/categories');
           }
         },
       ),
@@ -161,7 +161,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Available Categories",
+            "Available Services",
             style: TextStyle(
               fontSize: 18.sp,
               fontFamily: 'Playfair Display',

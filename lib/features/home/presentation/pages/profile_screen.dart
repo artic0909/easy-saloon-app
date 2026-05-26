@@ -516,7 +516,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else if (index == 2) {
             Get.offNamed('/packages');
           } else if (index == 3) {
-            Get.offNamed('/services');
+            Get.offNamed('/categories');
           }
         },
       ),
