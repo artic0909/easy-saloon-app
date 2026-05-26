@@ -106,7 +106,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ],
       ),
       bottomNavigationBar: AppBottomNav(
-        currentIndex: 4, // Since Categories is part of More / Drawer
+        currentIndex: 3,
         onTap: (index) {
           if (index == 4) {
             _scaffoldKey.currentState?.openDrawer();

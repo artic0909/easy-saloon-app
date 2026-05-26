@@ -25,7 +25,7 @@ class AppBottomNav extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.event_note_outlined), activeIcon: Icon(Icons.event_note), label: 'Bookings'),
         BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_outlined), activeIcon: Icon(Icons.card_giftcard), label: 'Packages'),
         BottomNavigationBarItem(icon: Icon(Icons.content_cut_outlined), activeIcon: Icon(Icons.content_cut), label: 'Services'),
-        BottomNavigationBarItem(icon: Icon(Icons.more_horiz_outlined), label: 'More'),
+        BottomNavigationBarItem(icon: Icon(Icons.more_horiz_outlined), activeIcon: Icon(Icons.more_horiz), label: 'More'),
       ],
     );
   }
