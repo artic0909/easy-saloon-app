@@ -26,7 +26,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isLoading = true;
   List<dynamic> _addresses = [];
   int? _selectedAddressId;
-  String _paymentMethod = 'online'; // 'cod' or 'online'
+  String _paymentMethod = 'online'; // 'cod', 'online', 'wallet'
+  double _walletBalance = 0.0;
 
   dynamic _bookingResponse;
 
@@ -52,6 +53,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
     _fetchAddresses();
+    _fetchWalletBalance();
   }
 
   @override
@@ -80,6 +82,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchWalletBalance() async {
+    try {
+      final response = await _apiService.dio.get('/wallet');
+      if (response.data['status'] == 'success') {
+        if (mounted) {
+          setState(() {
+            _walletBalance = double.tryParse(response.data['data']['wallet']['balance'].toString()) ?? 0.0;
+          });
+        }
+      }
+    } catch (e) {
+      // Ignore
     }
   }
 
@@ -168,6 +185,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         "Error",
         "Please select an address for home service",
         backgroundColor: Colors.red.withValues(alpha: 0.7),
+      );
+      return;
+    }
+
+    double payableAmount = _totalPrice - _couponDiscount;
+    if (payableAmount < 0) payableAmount = 0;
+
+    if (_paymentMethod == 'wallet' && payableAmount > _walletBalance) {
+      Get.snackbar(
+        "Insufficient Balance",
+        "Your wallet balance (₹${_walletBalance.toStringAsFixed(2)}) is less than the payable amount.",
+        backgroundColor: Colors.red.withValues(alpha: 0.7),
+        colorText: Colors.white,
       );
       return;
     }
@@ -557,11 +587,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             SizedBox(width: 15.w),
             Expanded(
               child: _buildPaymentMethodItem(
+                'wallet',
+                "Wallet (₹${_walletBalance.toStringAsFixed(0)})",
+                Icons.account_balance_wallet_outlined,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 15.h),
+        Row(
+          children: [
+            Expanded(
+              child: _buildPaymentMethodItem(
                 'cod',
                 "Pay at Salon/Home",
                 Icons.payments_outlined,
               ),
             ),
+            SizedBox(width: 15.w),
+            const Spacer(),
           ],
         ),
       ],
