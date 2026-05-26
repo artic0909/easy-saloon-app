@@ -33,6 +33,8 @@ import 'package:easysaloonapp/features/admin/bookings/ontheway.dart';
 import 'package:easysaloonapp/features/admin/bookings/complete.dart';
 import 'package:easysaloonapp/features/admin/bookings/cancel.dart';
 import 'package:easysaloonapp/features/admin/bookings/booking_details.dart';
+import 'package:easysaloonapp/features/admin/coupons/coupons.dart';
+import 'package:easysaloonapp/features/admin/coupons/add_edit.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 void main() async {
@@ -88,6 +90,8 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/admin-bookings-complete', page: () => const AdminCompleteBookingsPage()),
             GetPage(name: '/admin-bookings-cancel', page: () => const AdminCancelBookingsPage()),
             GetPage(name: '/admin-booking-details', page: () => const AdminBookingDetailsPage()),
+            GetPage(name: '/admin-manage-offers', page: () => const AdminCouponsScreen()),
+            GetPage(name: '/admin-add-edit-offer', page: () => const AdminAddEditCouponScreen()),
           ],
         );
       },
