@@ -137,7 +137,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           controller: _searchController,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: "Search categories...",
+            hintText: "Search services...",
             hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
             suffixIcon: _searchController.text.isNotEmpty

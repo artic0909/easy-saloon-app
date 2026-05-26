@@ -16,6 +16,8 @@ import 'package:easysaloonapp/features/home/presentation/pages/service_detail_sc
 import 'package:easysaloonapp/features/home/presentation/pages/package_detail_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/custom_package_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/checkout_screen.dart';
+import 'package:easysaloonapp/features/home/presentation/pages/wallet/wallet.dart';
+import 'package:easysaloonapp/features/home/presentation/pages/wallet/transactions.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/bookings/mybookings.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/bookings/booking_details.dart';
 import 'package:easysaloonapp/features/staff/dashboard.dart';
@@ -69,6 +71,8 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/package-detail', page: () => const PackageDetailScreen()),
             GetPage(name: '/custom-package', page: () => const CustomPackageScreen()),
             GetPage(name: '/checkout', page: () => const CheckoutScreen()),
+            GetPage(name: '/wallet', page: () => const WalletScreen()),
+            GetPage(name: '/wallet-transactions', page: () => const WalletTransactionsScreen()),
             GetPage(name: '/my-bookings', page: () => const MyBookingsPage()),
             GetPage(name: '/booking-details', page: () => const BookingDetailsPage()),
             GetPage(name: '/staff-dashboard', page: () => const StaffDashboard()),

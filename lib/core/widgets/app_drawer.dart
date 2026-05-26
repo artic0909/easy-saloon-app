@@ -70,10 +70,11 @@ class AppDrawer extends StatelessWidget {
                   Get.back();
                   Get.toNamed('/profile');
                 }, isActive: currentRoute == '/profile'),
-                _buildDrawerItem(Icons.notifications_outlined, "Notifications", () {
-                  Get.back();
-                  Get.toNamed('/notifications');
-                }, isActive: currentRoute == '/notifications'),
+                // _buildDrawerItem(Icons.notifications_outlined, "Notifications", () {
+                //   Get.back();
+                //   Get.toNamed('/notifications');
+                // }, isActive: currentRoute == '/notifications'),
+
                 // _buildDrawerItem(Icons.grid_view_outlined, "Categories", () {
                 //   Get.back();
                 //   Get.toNamed('/categories');
@@ -86,6 +87,10 @@ class AppDrawer extends StatelessWidget {
                   Get.back();
                   Get.toNamed('/packages');
                 }, isActive: currentRoute == '/packages'),
+                _buildDrawerItem(Icons.account_balance_wallet, "My Wallet", () {
+                  Get.back();
+                  Get.toNamed('/wallet');
+                }, isActive: currentRoute == '/wallet'),
                 _buildDrawerItem(Icons.auto_awesome, "Make own Package", () {
                   Get.back();
                   Get.toNamed('/custom-package');
@@ -100,7 +105,7 @@ class AppDrawer extends StatelessWidget {
                 }, isActive: currentRoute == '/coupons'),
                 const Divider(color: Colors.white10),
                 _buildDrawerItem(Icons.gavel, "Legal", () => Get.back()),
-                _buildDrawerItem(Icons.help_outline, "Help", () => Get.back()),
+                // _buildDrawerItem(Icons.help_outline, "Help", () => Get.back()),
                 SizedBox(height: 20.h),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.redAccent),
