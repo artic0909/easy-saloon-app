@@ -334,6 +334,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _showSuccessDialog() {
     Get.defaultDialog(
       title: "Booking Confirmed!",
+      barrierDismissible: false,
       middleText:
           "Your luxury session is scheduled. Check your email for details.",
       backgroundColor: AppColors.surface,
@@ -343,9 +344,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
       middleTextStyle: const TextStyle(color: Colors.white70),
       confirm: ElevatedButton(
-        onPressed: () => Get.offAllNamed('/home'),
+        onPressed: () {
+          if (_bookingResponse != null && _bookingResponse['data'] != null) {
+            final bookingData = Map<String, dynamic>.from(_bookingResponse['data']);
+            bookingData['booking_type'] = _bookingResponse['booking_type'] ?? (type == 'custom' ? 'custom' : 'regular');
+            
+            Get.offAllNamed('/home');
+            Get.toNamed('/booking-details', arguments: bookingData);
+          } else {
+            Get.offAllNamed('/home');
+          }
+        },
         style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-        child: const Text("Done", style: TextStyle(color: Colors.black)),
+        child: const Text("View Booking", style: TextStyle(color: Colors.black)),
       ),
     );
   }
