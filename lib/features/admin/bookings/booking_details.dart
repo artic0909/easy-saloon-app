@@ -22,8 +22,6 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
   List<dynamic> _staffMembers = [];
   
   bool _isLoading = false;
-  bool _isUpdatingStatus = false;
-  bool _isAssigningStaff = false;
   bool _isDeleting = false;
 
   @override
@@ -141,7 +139,6 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
 
     if (confirmed == true) {
       if (!mounted) return;
-      setState(() => _isUpdatingStatus = true);
       try {
         final id = _booking['id'];
         final bookingType = _booking['booking_type'] ?? 'regular';
@@ -160,15 +157,12 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
           message = e.response!.data['message'] ?? message;
         }
         Get.snackbar("Error", message, backgroundColor: const Color(0xFFC62828), colorText: Colors.white);
-      } finally {
-        if (mounted) setState(() => _isUpdatingStatus = false);
       }
     }
   }
 
   Future<void> _assignStaff(int staffId) async {
     if (!mounted) return;
-    setState(() => _isAssigningStaff = true);
     try {
       final id = _booking['id'];
       final bookingType = _booking['booking_type'] ?? 'regular';
@@ -187,8 +181,6 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
         message = e.response!.data['message'] ?? message;
       }
       Get.snackbar("Error", message, backgroundColor: const Color(0xFFC62828), colorText: Colors.white);
-    } finally {
-      if (mounted) setState(() => _isAssigningStaff = false);
     }
   }
 
