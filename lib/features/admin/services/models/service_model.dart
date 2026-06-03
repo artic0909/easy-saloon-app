@@ -8,10 +8,14 @@ class EquipmentModel {
   EquipmentModel({this.id, required this.name, this.image});
 
   factory EquipmentModel.fromJson(Map<String, dynamic> json) {
+    String? imageUrl = json['image'];
+    if (imageUrl != null && !imageUrl.startsWith('http')) {
+      imageUrl = 'https://test.sumatrasales.com/storage/$imageUrl';
+    }
     return EquipmentModel(
       id: json['id'],
       name: json['name'] ?? '',
-      image: json['image'],
+      image: imageUrl,
     );
   }
 
@@ -57,9 +61,19 @@ class ServiceModel {
     List<String>? imagesList;
     if (json['images'] != null) {
       if (json['images'] is List) {
-        imagesList = List<String>.from(json['images']);
+        imagesList = (json['images'] as List).map((img) {
+          String url = img.toString();
+          if (!url.startsWith('http')) {
+            url = 'https://test.sumatrasales.com/storage/$url';
+          }
+          return url;
+        }).toList();
       } else if (json['images'] is String) {
-        imagesList = [json['images']];
+        String url = json['images'];
+        if (!url.startsWith('http')) {
+          url = 'https://test.sumatrasales.com/storage/$url';
+        }
+        imagesList = [url];
       }
     }
     

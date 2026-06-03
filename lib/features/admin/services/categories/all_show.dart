@@ -5,6 +5,8 @@ import 'add_edit.dart';
 import 'service_category_wise_show.dart';
 
 class CategoryListScreen extends StatelessWidget {
+  CategoryListScreen({super.key});
+
   final AdminServiceController controller = Get.put(AdminServiceController());
 
   @override

@@ -12,10 +12,14 @@ class CategoryModel {
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    String? imageUrl = json['image'];
+    if (imageUrl != null && !imageUrl.startsWith('http')) {
+      imageUrl = 'https://test.sumatrasales.com/storage/$imageUrl';
+    }
     return CategoryModel(
       id: json['id'],
       name: json['name'],
-      image: json['image'],
+      image: imageUrl,
       slug: json['slug'],
     );
   }

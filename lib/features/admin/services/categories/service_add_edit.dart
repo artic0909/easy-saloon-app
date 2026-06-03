@@ -9,9 +9,10 @@ class ServiceAddEditScreen extends StatefulWidget {
   final int categoryId;
   final ServiceModel? service;
 
-  const ServiceAddEditScreen({Key? key, required this.categoryId, this.service}) : super(key: key);
+  const ServiceAddEditScreen({super.key, required this.categoryId, this.service});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ServiceAddEditScreenState createState() => _ServiceAddEditScreenState();
 }
 
@@ -25,10 +26,10 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
   
-  List<XFile> _newImages = [];
+  final List<XFile> _newImages = [];
   List<String> _existingImages = [];
   
-  List<TextEditingController> _whatIncludedControllers = [];
+  final List<TextEditingController> _whatIncludedControllers = [];
   List<int> _selectedEquipment = [];
 
   final ImagePicker _picker = ImagePicker();
@@ -115,7 +116,7 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
           builder: (context, setStateDialog) {
             return AlertDialog(
               title: Text('Select Equipment'),
-              content: Container(
+              content: SizedBox(
                 width: double.maxFinite,
                 child: Obx(() {
                   if (controller.isLoadingEquipments.value) {
@@ -239,7 +240,7 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 TextButton.icon(
                   onPressed: _addWhatIncludedField,
                   icon: Icon(Icons.add),
@@ -269,7 +270,10 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
                   children: [
                     ..._existingImages.asMap().entries.map((entry) => Stack(
                       children: [
-                        Image.network(entry.value, width: 80, height: 80, fit: BoxFit.cover),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(entry.value, width: 80, height: 80, fit: BoxFit.cover),
+                        ),
                         Positioned(
                           right: 0,
                           top: 0,
@@ -282,10 +286,13 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
                           ),
                         ),
                       ],
-                    )).toList(),
+                    )),
                     ..._newImages.asMap().entries.map((entry) => Stack(
                       children: [
-                        Image.file(File(entry.value.path), width: 80, height: 80, fit: BoxFit.cover),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(File(entry.value.path), width: 80, height: 80, fit: BoxFit.cover),
+                        ),
                         Positioned(
                           right: 0,
                           top: 0,
@@ -298,7 +305,7 @@ class _ServiceAddEditScreenState extends State<ServiceAddEditScreen> {
                           ),
                         ),
                       ],
-                    )).toList(),
+                    )),
                   ],
                 ),
                 SizedBox(height: 24),

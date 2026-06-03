@@ -7,9 +7,10 @@ import 'service_add_edit.dart';
 class ServiceCategoryWiseShowScreen extends StatefulWidget {
   final CategoryModel category;
 
-  const ServiceCategoryWiseShowScreen({Key? key, required this.category}) : super(key: key);
+  const ServiceCategoryWiseShowScreen({super.key, required this.category});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ServiceCategoryWiseShowScreenState createState() => _ServiceCategoryWiseShowScreenState();
 }
 

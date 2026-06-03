@@ -156,7 +156,11 @@ class AdminServiceController extends GetxController {
       
       if (existingImages != null) {
         for (int i = 0; i < existingImages.length; i++) {
-          dataMap['existing_images[$i]'] = existingImages[i];
+          String img = existingImages[i];
+          if (img.startsWith('https://test.sumatrasales.com/storage/')) {
+            img = img.replaceFirst('https://test.sumatrasales.com/storage/', '');
+          }
+          dataMap['existing_images[$i]'] = img;
         }
       }
 

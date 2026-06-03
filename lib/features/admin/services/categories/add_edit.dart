@@ -8,9 +8,10 @@ import '../models/category_model.dart';
 class CategoryAddEditScreen extends StatefulWidget {
   final CategoryModel? category;
 
-  const CategoryAddEditScreen({Key? key, this.category}) : super(key: key);
+  const CategoryAddEditScreen({super.key, this.category});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CategoryAddEditScreenState createState() => _CategoryAddEditScreenState();
 }
 
@@ -74,6 +75,7 @@ class _CategoryAddEditScreenState extends State<CategoryAddEditScreen> {
                 onTap: _pickImage,
                 child: Container(
                   height: 150,
+                  clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     border: Border.all(color: Colors.grey),
