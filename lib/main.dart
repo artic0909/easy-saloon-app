@@ -37,6 +37,7 @@ import 'package:easysaloonapp/features/admin/coupons/coupons.dart';
 import 'package:easysaloonapp/features/admin/coupons/add_edit.dart';
 import 'package:easysaloonapp/features/admin/staff/staff.dart';
 import 'package:easysaloonapp/features/admin/staff/add_edit.dart';
+import 'package:easysaloonapp/features/admin/services/categories/all_show.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 
 void main() async {
@@ -96,6 +97,7 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/admin-add-edit-offer', page: () => const AdminAddEditCouponScreen()),
             GetPage(name: '/admin-manage-staffs', page: () => const AdminManageStaffScreen()),
             GetPage(name: '/admin-add-edit-staff', page: () => const AdminAddEditStaffScreen()),
+            GetPage(name: '/admin-manage-services', page: () => CategoryListScreen()),
           ],
         );
       },
