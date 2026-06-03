@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
-import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
+import '../widgets/admin_bottom_nav.dart';
 import '../widgets/admin_drawer.dart';
 import 'controllers/admin_package_controller.dart';
 import 'models/package_model.dart';
@@ -76,13 +76,19 @@ class PackageListScreen extends StatelessWidget {
           },
         );
       }),
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: 2,
+      bottomNavigationBar: AdminBottomNav(
+        currentIndex: 3, // Packages
         onTap: (index) {
           if (index == 4) {
             _scaffoldKey.currentState?.openDrawer();
           } else if (index == 0) {
             Get.offAllNamed('/admin-dashboard');
+          } else if (index == 1) {
+            Get.toNamed('/admin-bookings-open');
+          } else if (index == 2) {
+            Get.toNamed('/admin-manage-services');
+          } else if (index == 3) {
+            Get.toNamed('/admin-manage-packages');
           }
         },
       ),
