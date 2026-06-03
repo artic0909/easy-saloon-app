@@ -39,13 +39,13 @@ class PackageModel {
     List<PackageItemModel> parsedItems = itemsList.map((e) => PackageItemModel.fromJson(e)).toList();
 
     return PackageModel(
-      id: json['id'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'],
       slug: json['slug'] ?? '',
       details: json['details'] ?? '',
       originalPrice: double.tryParse(json['original_price'].toString()) ?? 0.0,
       salePrice: double.tryParse(json['sale_price'].toString()) ?? 0.0,
-      isActive: json['is_active'] ?? 1,
+      isActive: int.tryParse(json['is_active'].toString()) ?? 1,
       image: resolvedImage,
       uniqueId: json['unique_id'],
       items: parsedItems,
@@ -68,9 +68,9 @@ class PackageItemModel {
 
   factory PackageItemModel.fromJson(Map<String, dynamic> json) {
     return PackageItemModel(
-      id: json['id'],
-      packageId: json['package_id'],
-      serviceId: json['service_id'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      packageId: int.tryParse(json['package_id'].toString()) ?? 0,
+      serviceId: int.tryParse(json['service_id'].toString()) ?? 0,
       service: json['service'] != null ? ServiceModel.fromJson(json['service']) : null,
     );
   }

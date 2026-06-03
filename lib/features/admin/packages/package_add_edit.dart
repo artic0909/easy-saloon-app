@@ -63,6 +63,16 @@ class _PackageAddEditScreenState extends State<PackageAddEditScreen> {
     }
   }
 
+  void _updateOriginalPrice() {
+    double total = 0;
+    for (var service in controller.allServices) {
+      if (service.id != null && _selectedServiceIds.contains(service.id)) {
+        total += service.salePrice;
+      }
+    }
+    _originalPriceController.text = total.toString();
+  }
+
   void _showServicesBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -92,30 +102,62 @@ class _PackageAddEditScreenState extends State<PackageAddEditScreen> {
                         if (controller.isLoadingServices.value) {
                           return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                         }
+
+                        // Group services by category
+                        final groupedServices = <String, List<dynamic>>{};
+                        for (var service in controller.allServices) {
+                          final categoryName = service.category?.name ?? 'Uncategorized';
+                          if (!groupedServices.containsKey(categoryName)) {
+                            groupedServices[categoryName] = [];
+                          }
+                          groupedServices[categoryName]!.add(service);
+                        }
+
                         return ListView.builder(
                           controller: scrollController,
-                          itemCount: controller.allServices.length,
+                          itemCount: groupedServices.length,
                           itemBuilder: (context, index) {
-                            final service = controller.allServices[index];
-                            final isSelected = _selectedServiceIds.contains(service.id);
-                            return CheckboxListTile(
-                              title: Text(service.name, style: const TextStyle(color: Colors.white)),
-                              subtitle: Text("₹${service.salePrice}", style: const TextStyle(color: Colors.white54)),
-                              activeColor: AppColors.primary,
-                              checkColor: Colors.black,
-                              value: isSelected,
-                              onChanged: (bool? checked) {
-                                setModalState(() {
-                                  if (service.id != null) {
-                                    if (checked == true) {
-                                      _selectedServiceIds.add(service.id!);
-                                    } else {
-                                      _selectedServiceIds.remove(service.id!);
-                                    }
-                                  }
-                                });
-                                setState(() {}); // Update parent UI
-                              },
+                            final categoryName = groupedServices.keys.elementAt(index);
+                            final services = groupedServices[categoryName]!;
+
+                            return Theme(
+                              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                              child: ExpansionTile(
+                                initiallyExpanded: true,
+                                iconColor: AppColors.primary,
+                                collapsedIconColor: Colors.white54,
+                                title: Text(
+                                  categoryName,
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                children: services.map((service) {
+                                  final isSelected = _selectedServiceIds.contains(service.id);
+                                  return CheckboxListTile(
+                                    title: Text(service.name, style: const TextStyle(color: Colors.white)),
+                                    subtitle: Text("₹${service.salePrice}", style: const TextStyle(color: Colors.white54)),
+                                    activeColor: AppColors.primary,
+                                    checkColor: Colors.black,
+                                    value: isSelected,
+                                    onChanged: (bool? checked) {
+                                      setModalState(() {
+                                        if (service.id != null) {
+                                          if (checked == true) {
+                                            _selectedServiceIds.add(service.id!);
+                                          } else {
+                                            _selectedServiceIds.remove(service.id!);
+                                          }
+                                        }
+                                      });
+                                      _updateOriginalPrice();
+                                      setState(() {}); // Update parent UI
+                                    },
+                                  );
+                                }).toList(),
+                              ),
                             );
                           },
                         );
