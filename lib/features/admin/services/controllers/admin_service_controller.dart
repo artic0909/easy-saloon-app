@@ -92,7 +92,10 @@ class AdminServiceController extends GetxController {
 
   Future<void> deleteCategory(int id) async {
     try {
-      final response = await _apiService.dio.delete('/admin/categories/$id');
+      final response = await _apiService.dio.post(
+        '/admin/categories/$id',
+        data: {'_method': 'DELETE'},
+      );
       if (response.statusCode == 200) {
         Get.snackbar('Success', 'Category deleted successfully');
         fetchCategories();
@@ -196,7 +199,10 @@ class AdminServiceController extends GetxController {
 
   Future<void> deleteService(int id, int categoryId) async {
     try {
-      final response = await _apiService.dio.delete('/admin/services/$id');
+      final response = await _apiService.dio.post(
+        '/admin/services/$id',
+        data: {'_method': 'DELETE'},
+      );
       if (response.statusCode == 200) {
         Get.snackbar('Success', 'Service deleted successfully');
         fetchServicesByCategory(categoryId);
