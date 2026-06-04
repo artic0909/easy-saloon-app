@@ -20,7 +20,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   bool _isLoading = true;
   Map<String, dynamic> _stats = {
     'total_customers': 0,
-    'active_bookings': 0,
+    'total_bookings': 0,
     'monthly_revenue': 0,
     'total_transactions': 0,
   };
@@ -104,8 +104,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Colors.blue,
                       ),
                       _buildGlassStatCard(
-                        _stats['active_bookings'].toString(),
-                        "Active Bookings",
+                        _stats['total_bookings'].toString(),
+                        "Total Bookings",
                         Icons.event_note,
                         Colors.orange,
                       ),
