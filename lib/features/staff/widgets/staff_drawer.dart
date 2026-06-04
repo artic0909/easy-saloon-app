@@ -10,8 +10,6 @@ class StaffDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
-    final userName = authService.userData['name'] ?? 'Staff';
-
     return Drawer(
       backgroundColor: AppColors.background,
       child: Column(
@@ -23,33 +21,36 @@ class StaffDrawer extends StatelessWidget {
               color: AppColors.surface,
               border: Border(bottom: BorderSide(color: AppColors.primary.withValues(alpha: 0.1))),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : 'S',
-                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+            child: Obx(() {
+              final userName = authService.userData['name'] ?? 'Staff';
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: AppColors.primary,
+                    child: Text(
+                      userName.isNotEmpty ? userName[0].toUpperCase() : 'S',
+                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
                   ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  userName,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.sp,
-                    fontFamily: 'Playfair Display',
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 16.h),
+                  Text(
+                    userName,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.sp,
+                      fontFamily: 'Playfair Display',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  "Staff Member",
-                  style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+                  Text(
+                    "Staff Member",
+                    style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              );
+            }),
           ),
           Expanded(
             child: ListView(

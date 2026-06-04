@@ -220,20 +220,22 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
   Widget _buildWelcomeHeader() {
     final authService = Get.find<AuthService>();
-    final name = authService.userData['name'] ?? 'Staff';
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Welcome back,",
-          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
-        ),
-        Text(
-          name,
-          style: TextStyle(color: AppColors.primary, fontSize: 24.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
-        ),
-      ],
-    );
+    return Obx(() {
+      final name = authService.userData['name'] ?? 'Staff';
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Welcome back,",
+            style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+          ),
+          Text(
+            name,
+            style: TextStyle(color: AppColors.primary, fontSize: 24.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildRatingCard() {

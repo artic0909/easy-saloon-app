@@ -10,7 +10,6 @@ class AdminDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
-    final userName = authService.userData['name'] ?? 'Admin';
 
     return Drawer(
       backgroundColor: AppColors.background,
@@ -24,7 +23,9 @@ class AdminDrawer extends StatelessWidget {
                 color: AppColors.surface,
                 border: Border(bottom: BorderSide(color: AppColors.primary.withValues(alpha: 0.1))),
               ),
-              child: Column(
+              child: Obx(() {
+              final userName = authService.userData['name'] ?? 'Admin';
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 8.h),
@@ -42,9 +43,10 @@ class AdminDrawer extends StatelessWidget {
                     style: TextStyle(color: AppColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold),
                   ),
                 ],
-              ),
-            ),
-            Expanded(
+              );
+            }),
+          ),
+          Expanded(
               child: ListView(
                 padding: EdgeInsets.symmetric(vertical: 8.h),
                 children: [
