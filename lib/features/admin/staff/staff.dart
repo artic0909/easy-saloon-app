@@ -258,6 +258,17 @@ class _AdminManageStaffScreenState extends State<AdminManageStaffScreen> {
               Text("${staff['experience_years'] ?? 0} Yrs", style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
             ],
           ),
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              Icon(Icons.star, color: Colors.amber, size: 14.w),
+              SizedBox(width: 4.w),
+              Text(
+                "${double.tryParse(staff['staff_rating']?.toString() ?? '0')?.toStringAsFixed(1) ?? '0.0'} (${staff['staff_rating_count'] ?? 0} reviews)",
+                style: TextStyle(color: Colors.amber, fontSize: 12.sp, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
           
           SizedBox(height: 16.h),
           Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),

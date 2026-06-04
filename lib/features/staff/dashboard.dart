@@ -26,6 +26,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
     'pending_bookings': '0',
     'completed_bookings': '0',
     'todays_bookings': '0',
+    'rating': 0.0,
+    'rating_count': 0,
   };
   List<dynamic> _todayBookings = [];
   bool _isLoading = true;
@@ -186,6 +188,9 @@ class _StaffDashboardState extends State<StaffDashboard> {
           _buildWelcomeHeader(),
           SizedBox(height: 24.h),
           
+          _buildRatingCard(),
+          SizedBox(height: 16.h),
+          
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -228,6 +233,50 @@ class _StaffDashboardState extends State<StaffDashboard> {
           style: TextStyle(color: AppColors.primary, fontSize: 24.sp, fontWeight: FontWeight.bold, fontFamily: 'Playfair Display'),
         ),
       ],
+    );
+  }
+
+  Widget _buildRatingCard() {
+    final rating = double.tryParse(_stats['rating']?.toString() ?? '0') ?? 0.0;
+    final ratingCount = int.tryParse(_stats['rating_count']?.toString() ?? '0') ?? 0;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "My Performance",
+                style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                "Average from $ratingCount reviews",
+                style: TextStyle(color: Colors.white60, fontSize: 12.sp),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Icon(Icons.star, color: Colors.amber, size: 28.sp),
+              SizedBox(width: 6.w),
+              Text(
+                rating.toStringAsFixed(1),
+                style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
