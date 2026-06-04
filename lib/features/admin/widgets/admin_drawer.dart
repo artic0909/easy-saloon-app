@@ -92,9 +92,9 @@ class AdminDrawer extends StatelessWidget {
                   }),
 
                   const Divider(color: Colors.white10),
-                  _buildDrawerItem(Icons.manage_accounts, "Account Settings", '/profile', () {
+                  _buildDrawerItem(Icons.manage_accounts, "Account Settings", '/admin-settings', () {
                     Get.back();
-                    Get.toNamed('/profile'); // or custom admin settings
+                    Get.toNamed('/admin-settings');
                   }),
                   SizedBox(height: 20.h),
                   ListTile(

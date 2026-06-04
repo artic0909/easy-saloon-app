@@ -96,8 +96,10 @@ class StaffDrawer extends StatelessWidget {
                   },
                 ),
                 const Divider(color: Colors.white10),
-                _buildDrawerItem(Icons.help_outline, "Help & Support", () => Get.back()),
-                _buildDrawerItem(Icons.settings_outlined, "Settings", () => Get.back()),
+                _buildDrawerItem(Icons.settings_outlined, "Settings", () {
+                  Get.back();
+                  Get.toNamed('/staff-settings');
+                }),
                 SizedBox(height: 20.h),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.redAccent),

@@ -40,6 +40,8 @@ import 'package:easysaloonapp/features/admin/staff/add_edit.dart';
 import 'package:easysaloonapp/features/admin/services/categories/all_show.dart';
 import 'package:easysaloonapp/features/admin/packages/package_list.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
+import 'package:easysaloonapp/features/admin/admin_settings_screen.dart';
+import 'package:easysaloonapp/features/staff/staff_settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -100,6 +102,8 @@ class MyApp extends StatelessWidget {
             GetPage(name: '/admin-add-edit-staff', page: () => const AdminAddEditStaffScreen()),
             GetPage(name: '/admin-manage-services', page: () => CategoryListScreen()),
             GetPage(name: '/admin-manage-packages', page: () => PackageListScreen()),
+            GetPage(name: '/admin-settings', page: () => const AdminSettingsScreen()),
+            GetPage(name: '/staff-settings', page: () => const StaffSettingsScreen()),
           ],
         );
       },
