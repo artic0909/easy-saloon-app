@@ -522,11 +522,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
       onTap: (index) {
         if (index == 4) {
           _scaffoldKey.currentState?.openDrawer();
+        } else if (index == 3) {
+          Get.toNamed('/staff-settings');
         } else {
           setState(() => _currentIndex = index);
-          if (index == 3) {
-            _fetchReportsData();
-          }
         }
       },
       backgroundColor: AppColors.background,
@@ -539,7 +538,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
         BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'Dashboard'),
         BottomNavigationBarItem(icon: Icon(Icons.event_note_outlined), activeIcon: Icon(Icons.event_note), label: 'Bookings'),
         BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), activeIcon: Icon(Icons.check_circle), label: 'Complete'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), activeIcon: Icon(Icons.bar_chart), label: 'Report'),
+        BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: 'Settings'),
         BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
       ],
     );
