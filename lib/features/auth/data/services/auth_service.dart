@@ -92,7 +92,6 @@ class AuthService extends GetxService {
 
   Future<Map<String, dynamic>> register({
     required String name,
-    required String email,
     required String phone,
     required String password,
     required String passwordConfirmation,
@@ -100,7 +99,6 @@ class AuthService extends GetxService {
     try {
       final response = await _apiService.dio.post('/register', data: {
         'name': name,
-        'email': email,
         'phone': phone,
         'password': password,
         'password_confirmation': passwordConfirmation,
@@ -137,6 +135,38 @@ class AuthService extends GetxService {
         'message': message,
         'errors': errors,
       };
+    }
+  }
+
+  Future<Map<String, dynamic>> sendOtp(String phone) async {
+    try {
+      final response = await _apiService.dio.post('/send-otp', data: {'phone': phone});
+      if (response.data['status'] == 'success') {
+        return {'success': true};
+      }
+      return {'success': false, 'message': response.data['message']};
+    } on DioException catch (e) {
+      String message = 'Failed to send OTP';
+      if (e.response?.data != null) {
+        message = e.response?.data['message'] ?? message;
+      }
+      return {'success': false, 'message': message};
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyOtp(String phone, String otp) async {
+    try {
+      final response = await _apiService.dio.post('/verify-otp', data: {'phone': phone, 'otp': otp});
+      if (response.data['status'] == 'success') {
+        return {'success': true};
+      }
+      return {'success': false, 'message': response.data['message']};
+    } on DioException catch (e) {
+      String message = 'Failed to verify OTP';
+      if (e.response?.data != null) {
+        message = e.response?.data['message'] ?? message;
+      }
+      return {'success': false, 'message': message};
     }
   }
 

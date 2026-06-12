@@ -15,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  int _currentStep = 0; // 0: phone, 1: otp, 2: password
   bool _agreeToTerms = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -23,17 +24,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   
   final _authService = Get.find<AuthService>();
 
+  void _handleSendOtp() async {
+    setState(() => _fieldErrors = {}); 
+    if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
+      if (_nameController.text.isEmpty) _fieldErrors['name'] = 'Name is required';
+      if (_phoneController.text.isEmpty) _fieldErrors['phone'] = 'Phone is required';
+      setState(() {});
+      return;
+    }
+    setState(() => _isLoading = true);
+    final result = await _authService.sendOtp(_phoneController.text);
+    setState(() => _isLoading = false);
+    if (result['success']) {
+      setState(() => _currentStep = 1);
+    } else {
+      _showErrorSnackbar(result['message'] ?? 'Failed to send OTP');
+    }
+  }
+
+  void _handleVerifyOtp() async {
+    setState(() => _fieldErrors = {}); 
+    if (_otpController.text.isEmpty) {
+      setState(() => _fieldErrors['otp'] = 'OTP is required');
+      return;
+    }
+    setState(() => _isLoading = true);
+    final result = await _authService.verifyOtp(_phoneController.text, _otpController.text);
+    setState(() => _isLoading = false);
+    if (result['success']) {
+      setState(() => _currentStep = 2);
+    } else {
+      _showErrorSnackbar(result['message'] ?? 'Invalid OTP');
+    }
+  }
+
   void _handleRegister() async {
     setState(() => _fieldErrors = {}); 
     
-    if (!_formKey.currentState!.validate()) return;
+    if (_passwordController.text.length < 8) {
+      setState(() => _fieldErrors['password'] = 'Min 8 characters');
+      return;
+    }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() => _fieldErrors['password_confirmation'] = 'Passwords do not match');
@@ -49,7 +87,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     
     final result = await _authService.register(
       name: _nameController.text,
-      email: _emailController.text,
       phone: _phoneController.text,
       password: _passwordController.text,
       passwordConfirmation: _confirmPasswordController.text,
@@ -181,81 +218,115 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           SizedBox(height: 30.h),
-                          _buildTextField(
-                            controller: _nameController,
-                            label: 'FULL NAME',
-                            hint: 'John Doe',
-                            errorKey: 'name',
-                            validator: (v) => v!.isEmpty ? 'Name is required' : null,
-                          ),
-                          SizedBox(height: 16.h),
-                          _buildTextField(
-                            controller: _emailController,
-                            label: 'EMAIL ADDRESS',
-                            hint: 'name@example.com',
-                            errorKey: 'email',
-                            validator: (v) => GetUtils.isEmail(v!) ? null : 'Invalid email',
-                          ),
-                          SizedBox(height: 16.h),
-                          _buildTextField(
-                            controller: _phoneController,
-                            label: 'PHONE NUMBER',
-                            hint: '+1 234 567 890',
-                            errorKey: 'phone',
-                            validator: (v) => v!.isEmpty ? 'Phone is required' : null,
-                          ),
-                          SizedBox(height: 16.h),
-                          _buildTextField(
-                            controller: _passwordController,
-                            label: 'PASSWORD',
-                            hint: '********',
-                            errorKey: 'password',
-                            isPassword: true,
-                            obscureText: _obscurePassword,
-                            onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
-                            validator: (v) => v!.length < 8 ? 'Min 8 characters' : null,
-                          ),
-                          SizedBox(height: 16.h),
-                          _buildTextField(
-                            controller: _confirmPasswordController,
-                            label: 'CONFIRM PASSWORD',
-                            hint: '********',
-                            errorKey: 'password_confirmation',
-                            isPassword: true,
-                            obscureText: _obscureConfirmPassword,
-                            onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-                          ),
-                          SizedBox(height: 20.h),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _agreeToTerms,
-                                onChanged: (val) => setState(() => _agreeToTerms = val!),
-                                activeColor: AppColors.primary,
-                                side: const BorderSide(color: Colors.white54),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "I AGREE TO THE TERMS OF SERVICE",
-                                  style: TextStyle(color: Colors.white70, fontSize: 10.sp),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 24.h),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _handleRegister,
-                              child: _isLoading 
-                                  ? const SizedBox(
-                                      height: 20, 
-                                      width: 20, 
-                                      child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
-                                    )
-                                  : const Text('CREATE ACCOUNT →'),
+                          if (_currentStep == 0) ...[
+                            _buildTextField(
+                              controller: _nameController,
+                              label: 'FULL NAME',
+                              hint: 'John Doe',
+                              errorKey: 'name',
                             ),
-                          ),
+                            SizedBox(height: 16.h),
+                            _buildTextField(
+                              controller: _phoneController,
+                              label: 'PHONE NUMBER',
+                              hint: '+91 98765 43210',
+                              errorKey: 'phone',
+                            ),
+                            SizedBox(height: 24.h),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _handleSendOtp,
+                                child: _isLoading 
+                                    ? const SizedBox(
+                                        height: 20, 
+                                        width: 20, 
+                                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
+                                      )
+                                    : const Text('SEND OTP →'),
+                              ),
+                            ),
+                          ],
+                          if (_currentStep == 1) ...[
+                            Text(
+                              'Enter the OTP sent to ${_phoneController.text}',
+                              style: const TextStyle(color: Colors.white70),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildTextField(
+                              controller: _otpController,
+                              label: 'OTP',
+                              hint: '123456',
+                              errorKey: 'otp',
+                            ),
+                            SizedBox(height: 24.h),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _handleVerifyOtp,
+                                child: _isLoading 
+                                    ? const SizedBox(
+                                        height: 20, 
+                                        width: 20, 
+                                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
+                                      )
+                                    : const Text('VERIFY OTP →'),
+                              ),
+                            ),
+                          ],
+                          if (_currentStep == 2) ...[
+                            _buildTextField(
+                              controller: _passwordController,
+                              label: 'PASSWORD',
+                              hint: '********',
+                              errorKey: 'password',
+                              isPassword: true,
+                              obscureText: _obscurePassword,
+                              onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildTextField(
+                              controller: _confirmPasswordController,
+                              label: 'CONFIRM PASSWORD',
+                              hint: '********',
+                              errorKey: 'password_confirmation',
+                              isPassword: true,
+                              obscureText: _obscureConfirmPassword,
+                              onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                            ),
+                            SizedBox(height: 20.h),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _agreeToTerms,
+                                  onChanged: (val) => setState(() => _agreeToTerms = val!),
+                                  activeColor: AppColors.primary,
+                                  side: const BorderSide(color: Colors.white54),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "I AGREE TO THE TERMS OF SERVICE",
+                                    style: TextStyle(color: Colors.white70, fontSize: 10.sp),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24.h),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _handleRegister,
+                                child: _isLoading 
+                                    ? const SizedBox(
+                                        height: 20, 
+                                        width: 20, 
+                                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
+                                      )
+                                    : const Text('CREATE ACCOUNT →'),
+                              ),
+                            ),
+                          ],
                           SizedBox(height: 20.h),
                           GestureDetector(
                             onTap: () => Get.back(),
