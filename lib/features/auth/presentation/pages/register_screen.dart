@@ -16,14 +16,11 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   int _currentStep = 0; // 0: phone, 1: otp, 2: password
-  bool _agreeToTerms = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   Map<String, String> _fieldErrors = {};
   final _formKey = GlobalKey<FormState>();
-  
-  final _nameController = TextEditingController();
   
   final _phoneController = TextEditingController(text: '+91');
   final _otpController = TextEditingController();
@@ -34,10 +31,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _handleSendOtp() async {
     setState(() => _fieldErrors = {}); 
-    if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
-      if (_nameController.text.isEmpty) _fieldErrors['name'] = 'Name is required';
-      if (_phoneController.text.isEmpty) _fieldErrors['phone'] = 'Phone is required';
-      setState(() {});
+    if (_phoneController.text.isEmpty) {
+      setState(() => _fieldErrors['phone'] = 'Phone is required');
       return;
     }
     setState(() => _isLoading = true);
@@ -79,15 +74,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    if (!_agreeToTerms) {
-      _showErrorSnackbar('Please agree to terms of service');
-      return;
-    }
-
     setState(() => _isLoading = true);
     
     final result = await _authService.register(
-      name: _nameController.text,
       phone: _phoneController.text,
       password: _passwordController.text,
       passwordConfirmation: _confirmPasswordController.text,
@@ -221,13 +210,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(height: 30.h),
                           if (_currentStep == 0) ...[
                             _buildTextField(
-                              controller: _nameController,
-                              label: 'FULL NAME',
-                              hint: 'John Doe',
-                              errorKey: 'name',
-                            ),
-                            SizedBox(height: 16.h),
-                            _buildTextField(
                               controller: _phoneController,
                               label: 'PHONE NUMBER',
                               hint: '+91 98765 43210',
@@ -296,23 +278,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               obscureText: _obscureConfirmPassword,
                               onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                             ),
-                            SizedBox(height: 20.h),
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: _agreeToTerms,
-                                  onChanged: (val) => setState(() => _agreeToTerms = val!),
-                                  activeColor: AppColors.primary,
-                                  side: const BorderSide(color: Colors.white54),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    "I AGREE TO THE TERMS OF SERVICE",
-                                    style: TextStyle(color: Colors.white70, fontSize: 10.sp),
-                                  ),
-                                ),
-                              ],
-                            ),
+
                             SizedBox(height: 24.h),
                             SizedBox(
                               width: double.infinity,

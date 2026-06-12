@@ -91,14 +91,12 @@ class AuthService extends GetxService {
   }
 
   Future<Map<String, dynamic>> register({
-    required String name,
     required String phone,
     required String password,
     required String passwordConfirmation,
   }) async {
     try {
       final response = await _apiService.dio.post('/register', data: {
-        'name': name,
         'phone': phone,
         'password': password,
         'password_confirmation': passwordConfirmation,
