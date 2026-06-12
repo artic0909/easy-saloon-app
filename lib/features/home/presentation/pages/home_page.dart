@@ -6,7 +6,9 @@ import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/features/home/presentation/widgets/scratch_card_modal.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,7 +38,36 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _fetchAllData();
+    _checkScratchCardStatus();
     _searchController.addListener(_filterCategories);
+  }
+
+  Future<void> _checkScratchCardStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+    if (token == null) return;
+
+    try {
+      final response = await _apiService.dio.get('/user/scratch-card-status');
+      if (response.data['success'] == true) {
+        final showCard = response.data['show_scratch_card'] ?? false;
+        final totalBookings = response.data['total_confirmed_bookings'] ?? 0;
+        
+        if (showCard) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => ScratchCardModal(
+                totalConfirmedBookings: totalBookings,
+              ),
+            );
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching scratch card status: $e");
+    }
   }
 
   @override

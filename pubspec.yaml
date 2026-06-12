@@ -49,6 +49,7 @@ dependencies:
   flutter_widget_from_html: ^0.16.1
   url_launcher: ^6.3.0
   image_picker: ^1.1.2
+  scratcher: ^2.5.0
 
 dev_dependencies:
   flutter_test:

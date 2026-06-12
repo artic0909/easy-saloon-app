@@ -6,6 +6,7 @@ import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:dio/dio.dart';
+import 'package:easysaloonapp/features/home/presentation/widgets/scratch_card_modal.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -39,6 +40,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String? _couponError;
   String? _couponSuccessMessage;
 
+  bool _isFreeSecondBookingAvailable = false;
+  List<dynamic> _freeServiceIds = [];
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +58,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     _fetchAddresses();
     _fetchWalletBalance();
+    _fetchScratchCardEligibility();
+  }
+
+  Future<void> _fetchScratchCardEligibility() async {
+    try {
+      final response = await _apiService.dio.get('/user/scratch-card-status');
+      if (response.data['success'] == true) {
+        if (mounted) {
+          setState(() {
+            _isFreeSecondBookingAvailable = response.data['free_second_booking_available'] ?? false;
+            _freeServiceIds = response.data['free_service_ids'] ?? [];
+          });
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 
   @override
@@ -109,6 +130,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return total;
     }
     return double.tryParse(itemData['sale_price'].toString()) ?? 0;
+  }
+
+  double get _freeDiscountAmount {
+    if (!_isFreeSecondBookingAvailable || _freeServiceIds.isEmpty) return 0.0;
+    
+    if (type == 'service') {
+      if (_freeServiceIds.contains(itemData['id'])) {
+        return _totalPrice;
+      }
+    } else if (type == 'custom') {
+      double freeAmount = 0;
+      for (var s in itemData) {
+        if (_freeServiceIds.contains(s['id'])) {
+          freeAmount += double.tryParse(s['sale_price'].toString()) ?? 0;
+        }
+      }
+      return freeAmount;
+    }
+    return 0.0;
   }
 
   Future<void> _verifyCoupon() async {
@@ -189,7 +229,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
-    double payableAmount = _totalPrice - _couponDiscount;
+    double payableAmount = _totalPrice - _couponDiscount - _freeDiscountAmount;
     if (payableAmount < 0) payableAmount = 0;
 
     if (_paymentMethod == 'wallet' && payableAmount > _walletBalance) {
@@ -235,10 +275,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       if (response.data['status'] == 'success') {
         _bookingResponse = response.data;
-        if (_paymentMethod == 'online') {
+        
+        if (response.data['is_free'] == true) {
+          _showScratchCardFlow(response.data);
+        } else if (_paymentMethod == 'online') {
           _startRazorpayPayment();
         } else {
-          _showSuccessDialog();
+          _showScratchCardFlow(response.data);
         }
       }
     } catch (e) {
@@ -299,7 +342,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           _bookingResponse['booking_type'] ??
           (type == 'custom' ? 'custom' : 'regular');
 
-      await _apiService.dio.post(
+      final verifyResponse = await _apiService.dio.post(
         '/payments/verify',
         data: {
           'booking_id': bookingId,
@@ -310,7 +353,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         },
       );
 
-      _showSuccessDialog();
+      if (verifyResponse.data['status'] == 'success') {
+        _showScratchCardFlow(verifyResponse.data);
+      } else {
+        _showSuccessDialog();
+      }
     } catch (e) {
       Get.snackbar(
         "Verification Failed",
@@ -331,12 +378,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _handleExternalWallet(ExternalWalletResponse response) {}
 
+  void _showScratchCardFlow(dynamic responseData) {
+    if (responseData['show_scratch_card'] == true) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ScratchCardModal(
+          totalConfirmedBookings: responseData['total_confirmed_bookings'] ?? 1,
+        ),
+      ).then((_) {
+        _showSuccessDialog();
+      });
+    } else {
+      _showSuccessDialog();
+    }
+  }
+
   void _showSuccessDialog() {
+    bool isFree = false;
+    if (_bookingResponse != null && _bookingResponse['is_free'] == true) {
+      isFree = true;
+    }
+
     Get.defaultDialog(
-      title: "Booking Confirmed!",
+      title: isFree ? "Free Booking Confirmed!" : "Booking Confirmed!",
       barrierDismissible: false,
       middleText:
-          "Your luxury session is scheduled. Check your email for details.",
+          isFree 
+              ? "Your luxury session has been scheduled completely FREE! Check your email for details."
+              : "Your luxury session is scheduled. Check your email for details.",
       backgroundColor: AppColors.surface,
       titleStyle: const TextStyle(
         color: AppColors.primary,
@@ -660,7 +730,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildPriceBreakdown() {
-    double payableAmount = _totalPrice - _couponDiscount;
+    double payableAmount = _totalPrice - _couponDiscount - _freeDiscountAmount;
     if (payableAmount < 0) payableAmount = 0;
 
     return Column(
@@ -674,10 +744,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             Text(
               "₹${_totalPrice.toStringAsFixed(2)}",
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              style: _freeDiscountAmount > 0 
+                  ? TextStyle(color: Colors.white54, fontSize: 14.sp, decoration: TextDecoration.lineThrough)
+                  : TextStyle(color: Colors.white, fontSize: 14.sp),
             ),
           ],
         ),
+        if (_freeDiscountAmount > 0) ...[
+          SizedBox(height: 10.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Free Second Booking Offer!",
+                style: TextStyle(color: Colors.white54, fontSize: 14.sp),
+              ),
+              Text(
+                "- ₹${_freeDiscountAmount.toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: Colors.greenAccent,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
         if (_couponDiscount > 0) ...[
           SizedBox(height: 10.h),
           Row(
