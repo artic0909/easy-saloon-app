@@ -24,7 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   
   final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
+  
+  final _phoneController = TextEditingController(text: '+91');
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
