@@ -261,7 +261,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
               ),
               hint: const Text("Select Staff Member", style: TextStyle(color: Colors.white38)),
-              value: selectedStaffId,
+              initialValue: selectedStaffId,
               items: _staffMembers.map((staff) {
                 return DropdownMenuItem<int>(
                   value: staff['id'],
@@ -312,7 +312,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
               ),
-              value: statuses.contains(selectedStatus) ? selectedStatus : null,
+              initialValue: statuses.contains(selectedStatus) ? selectedStatus : null,
               items: statuses.map((s) {
                 return DropdownMenuItem<String>(
                   value: s,

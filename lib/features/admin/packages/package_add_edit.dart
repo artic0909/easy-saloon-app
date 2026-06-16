@@ -249,7 +249,7 @@ class _PackageAddEditScreenState extends State<PackageAddEditScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text("Is Active", style: TextStyle(color: Colors.white)),
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   value: _isActive,
                   onChanged: (val) => setState(() => _isActive = val),
                 ),

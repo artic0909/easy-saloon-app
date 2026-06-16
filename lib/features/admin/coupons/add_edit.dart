@@ -194,7 +194,7 @@ class _AdminAddEditCouponScreenState extends State<AdminAddEditCouponScreen> {
 
                     // Discount Type Dropdown
                     DropdownButtonFormField<String>(
-                      value: _discountType,
+                      initialValue: _discountType,
                       dropdownColor: AppColors.surface,
                       style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration("Discount Type", Icons.local_offer),
@@ -295,7 +295,7 @@ class _AdminAddEditCouponScreenState extends State<AdminAddEditCouponScreen> {
                           ),
                           Switch(
                             value: _isActive,
-                            activeColor: AppColors.primary,
+                            activeThumbColor: AppColors.primary,
                             onChanged: (val) => setState(() => _isActive = val),
                           ),
                         ],
