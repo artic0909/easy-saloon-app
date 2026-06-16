@@ -17,6 +17,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
   final ApiService _apiService = ApiService();
   bool _isClaimed = false;
   bool _isLoading = false;
+  String? _claimMessage;
 
   String _getSuffix(int number) {
     if ([11, 12, 13].contains(number % 100)) {
@@ -43,6 +44,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
         setState(() {
           _isClaimed = true;
           _isLoading = false;
+          _claimMessage = response.data['message'] ?? 'Reward claimed!';
         });
       } else {
         setState(() {
@@ -150,10 +152,10 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
             ],
             if (_isClaimed) ...[
               const SizedBox(height: 24),
-              const Text(
-                'You have unlocked a FREE eligible service on your next booking!',
+              Text(
+                _claimMessage ?? 'You have unlocked a FREE eligible service on your next booking!',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.green,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
