@@ -65,6 +65,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
     int nextBooking = widget.totalConfirmedBookings + 1;
     String currentBookingText = '${widget.totalConfirmedBookings}${_getSuffix(widget.totalConfirmedBookings)}';
     String nextBookingText = '$nextBooking${_getSuffix(nextBooking)} Booking';
+    bool isFreeBookingReward = widget.totalConfirmedBookings > 1 && widget.totalConfirmedBookings % 10 == 0;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -125,7 +126,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'FREE',
+                          isFreeBookingReward ? 'FREE' : 'REWARD',
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
@@ -133,7 +134,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
                           ),
                         ),
                         Text(
-                          '$nextBookingText!',
+                          isFreeBookingReward ? '$nextBookingText!' : 'Wallet Cash!',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -153,7 +154,7 @@ class _ScratchCardModalState extends State<ScratchCardModal> {
             if (_isClaimed) ...[
               const SizedBox(height: 24),
               Text(
-                _claimMessage ?? 'You have unlocked a FREE eligible service on your next booking!',
+                _claimMessage ?? (isFreeBookingReward ? 'You have unlocked a FREE eligible service on your next booking!' : 'Better luck next time!'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.green,
