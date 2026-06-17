@@ -7,6 +7,7 @@ import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:easysaloonapp/features/home/presentation/widgets/scratch_card_modal.dart';
+import 'package:easysaloonapp/core/localization/translation_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,9 +114,11 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await _apiService.dio.get('/categories');
       if (response.data['status'] == 'success') {
+        var cats = response.data['data'];
+        cats = await TranslationHelper.translateList(cats, ['name']);
         setState(() {
-          _categories = response.data['data'];
-          _filteredCategories = _categories;
+          _categories = cats;
+          _filteredCategories = cats;
         });
       }
     } catch (e) {

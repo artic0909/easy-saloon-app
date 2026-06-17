@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/localization/translation_helper.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 
@@ -32,8 +33,22 @@ class _PackagesScreenState extends State<PackagesScreen> {
     try {
       final response = await _apiService.dio.get('/packages');
       if (response.data['status'] == 'success') {
+        var pkgs = response.data['data'];
+        pkgs = await TranslationHelper.translateList(pkgs, ['name', 'details', 'description']);
+        
+        // Translate nested service names inside packages
+        for (var pkg in pkgs) {
+          if (pkg['items'] != null && pkg['items'] is List) {
+            for (var item in pkg['items']) {
+              if (item['service'] != null && item['service']['name'] != null) {
+                item['service']['name'] = await TranslationHelper.translateText(item['service']['name']);
+              }
+            }
+          }
+        }
+
         setState(() {
-          _packages = response.data['data'];
+          _packages = pkgs;
           _filteredPackages = _packages;
           _isLoading = false;
         });

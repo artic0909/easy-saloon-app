@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/localization/translation_helper.dart';
 import 'package:intl/intl.dart';
 
 class CustomPackageScreen extends StatefulWidget {
@@ -35,9 +36,18 @@ class _CustomPackageScreenState extends State<CustomPackageScreen> {
     try {
       final response = await _apiService.dio.get('/packages/custom-data');
       if (response.data['status'] == 'success') {
+        var cats = response.data['data'];
+        cats = await TranslationHelper.translateList(cats, ['name']);
+        
+        for (var cat in cats) {
+          if (cat['services'] != null && cat['services'] is List) {
+            cat['services'] = await TranslationHelper.translateList(cat['services'], ['name', 'short_description']);
+          }
+        }
+
         setState(() {
-          _categories = response.data['data'];
-          _filteredCategories = _categories;
+          _categories = cats;
+          _filteredCategories = cats;
           _isLoading = false;
         });
       }

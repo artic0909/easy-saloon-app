@@ -50,6 +50,7 @@ dependencies:
   url_launcher: ^6.3.0
   image_picker: ^1.1.2
   scratcher: ^2.5.0
+  translator: ^1.0.4+1
 
 dev_dependencies:
   flutter_test:

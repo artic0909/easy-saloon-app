@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/localization/translation_helper.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 
@@ -42,10 +43,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
     try {
       final response = await _apiService.dio.get('/categories');
       if (response.data['status'] == 'success') {
+        var cats = response.data['data'] ?? [];
+        cats = await TranslationHelper.translateList(cats, ['name']);
         if (!mounted) return;
         setState(() {
-          _categories = response.data['data'] ?? [];
-          _filteredCategories = _categories;
+          _categories = cats;
+          _filteredCategories = cats;
           _isLoading = false;
         });
       } else {

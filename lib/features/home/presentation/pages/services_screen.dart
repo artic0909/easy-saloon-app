@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 import 'package:easysaloonapp/core/network/api_service.dart';
+import 'package:easysaloonapp/core/localization/translation_helper.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 
@@ -48,8 +49,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
     try {
       final response = await _apiService.dio.get('/services/filters');
       if (response.data['status'] == 'success') {
+        var cats = response.data['data']['categories'] ?? [];
+        cats = await TranslationHelper.translateList(cats, ['name']);
         setState(() {
-          _categories = response.data['data']['categories'] ?? [];
+          _categories = cats;
         });
       }
     } catch (e) {
@@ -72,9 +75,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
       final response = await _apiService.dio.get('/services', queryParameters: params);
       if (response.data['status'] == 'success') {
+        var srvs = response.data['data'];
+        srvs = await TranslationHelper.translateList(srvs, ['name', 'short_description']);
         if (!mounted) return;
         setState(() {
-          _services = response.data['data'];
+          _services = srvs;
           _isLoading = false;
         });
       }
