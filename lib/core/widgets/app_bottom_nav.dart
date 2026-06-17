@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
 
 class AppBottomNav extends StatelessWidget {
@@ -20,12 +21,32 @@ class AppBottomNav extends StatelessWidget {
       selectedItemColor: AppColors.primary,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.event_note_outlined), activeIcon: Icon(Icons.event_note), label: 'Bookings'),
-        BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_outlined), activeIcon: Icon(Icons.card_giftcard), label: 'Packages'),
-        BottomNavigationBarItem(icon: Icon(Icons.content_cut_outlined), activeIcon: Icon(Icons.content_cut), label: 'Services'),
-        BottomNavigationBarItem(icon: Icon(Icons.more_horiz_outlined), activeIcon: Icon(Icons.more_horiz), label: 'More'),
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          activeIcon: Icon(Icons.home),
+          label: 'home'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.event_note_outlined),
+          activeIcon: Icon(Icons.event_note),
+          label: 'bookings'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.card_giftcard_outlined),
+          activeIcon: Icon(Icons.card_giftcard),
+          label: 'packages'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.content_cut_outlined),
+          activeIcon: Icon(Icons.content_cut),
+          label: 'services'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.more_horiz_outlined),
+          activeIcon: Icon(Icons.more_horiz),
+          label: 'more'.tr,
+        ),
       ],
     );
   }

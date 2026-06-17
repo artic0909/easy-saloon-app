@@ -192,14 +192,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Create Account',
+                            'create_account'.tr,
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               color: Colors.white,
                             ),
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            'START YOUR JOURNEY WITH US',
+                            'join_us'.tr.toUpperCase(),
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 10.sp,
@@ -211,7 +211,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (_currentStep == 0) ...[
                             _buildTextField(
                               controller: _phoneController,
-                              label: 'PHONE NUMBER',
+                              label: 'phone_number'.tr.toUpperCase(),
                               hint: '+91 98765 43210',
                               errorKey: 'phone',
                             ),
@@ -261,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (_currentStep == 2) ...[
                             _buildTextField(
                               controller: _passwordController,
-                              label: 'PASSWORD',
+                              label: 'password'.tr.toUpperCase(),
                               hint: '********',
                               errorKey: 'password',
                               isPassword: true,
@@ -271,7 +271,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: 16.h),
                             _buildTextField(
                               controller: _confirmPasswordController,
-                              label: 'CONFIRM PASSWORD',
+                              label: 'confirm_password'.tr.toUpperCase(),
                               hint: '********',
                               errorKey: 'password_confirmation',
                               isPassword: true,
@@ -290,7 +290,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         width: 20, 
                                         child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)
                                       )
-                                    : const Text('CREATE ACCOUNT →'),
+                                    : Text('${'create_account'.tr.toUpperCase()} →'),
                               ),
                             ),
                           ],
@@ -299,11 +299,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onTap: () => Get.back(),
                             child: RichText(
                               text: TextSpan(
-                                text: "Already have an account? ",
+                                text: "${'already_have_account'.tr} ",
                                 style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
                                 children: [
                                   TextSpan(
-                                    text: "SIGN IN INSTEAD",
+                                    text: 'login_here'.tr.toUpperCase(),
                                     style: TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,

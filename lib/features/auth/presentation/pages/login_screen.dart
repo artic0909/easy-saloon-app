@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easysaloonapp/core/constants/app_colors.dart';
-import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
+// Unused import removed
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
 import 'package:easysaloonapp/core/widgets/salon_loader.dart';
+import 'package:easysaloonapp/core/localization/language_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -186,7 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
                               ),
                               GestureDetector(
-                                onTap: () => Get.to(() => const RegisterScreen()),
+                                onTap: () {
+                                  if (!LanguageService.to.hasSelectedLanguage) {
+                                    Get.toNamed('/language-selection');
+                                  } else {
+                                    Get.toNamed('/register');
+                                  }
+                                },
                                 child: Text(
                                   "REGISTER",
                                   style: TextStyle(

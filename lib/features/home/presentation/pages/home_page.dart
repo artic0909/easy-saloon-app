@@ -52,15 +52,15 @@ class _HomePageState extends State<HomePage> {
       if (response.data['success'] == true) {
         final showCard = response.data['show_scratch_card'] ?? false;
         final totalBookings = response.data['total_confirmed_bookings'] ?? 0;
-        
+
         if (showCard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => ScratchCardModal(
-                totalConfirmedBookings: totalBookings,
-              ),
+              builder:
+                  (context) =>
+                      ScratchCardModal(totalConfirmedBookings: totalBookings),
             );
           });
         }
@@ -165,9 +165,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final pages = [
       _buildHomeContent(),
-      _buildPlaceholderContent("My Bookings"),
-      _buildPlaceholderContent("Packages"),
-      _buildPlaceholderContent("Services"),
+      _buildPlaceholderContent('my_bookings'.tr),
+      _buildPlaceholderContent('packages'.tr),
+      _buildPlaceholderContent('services'.tr),
     ];
 
     return PopScope(
@@ -177,27 +177,28 @@ class _HomePageState extends State<HomePage> {
         setState(() => _currentIndex = 0);
       },
       child: Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: AppColors.background,
-      drawer: const AppDrawer(),
-      body: pages[_currentIndex],
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          if (index == 4) {
-            _scaffoldKey.currentState?.openDrawer();
-          } else if (index == 3) {
-            Get.toNamed('/categories');
-          } else if (index == 2) {
-            Get.toNamed('/packages');
-          } else if (index == 1) {
-            Get.toNamed('/my-bookings');
-          } else {
-            setState(() => _currentIndex = index);
-          }
-        },
+        key: _scaffoldKey,
+        backgroundColor: AppColors.background,
+        drawer: const AppDrawer(),
+        body: pages[_currentIndex],
+        bottomNavigationBar: AppBottomNav(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            if (index == 4) {
+              _scaffoldKey.currentState?.openDrawer();
+            } else if (index == 3) {
+              Get.toNamed('/categories');
+            } else if (index == 2) {
+              Get.toNamed('/packages');
+            } else if (index == 1) {
+              Get.toNamed('/my-bookings');
+            } else {
+              setState(() => _currentIndex = index);
+            }
+          },
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildPlaceholderContent(String title) {
@@ -220,7 +221,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Text(
-            "Coming Soon",
+            'coming_soon'.tr,
             style: TextStyle(color: AppColors.primary, fontSize: 14.sp),
           ),
         ],
@@ -238,7 +239,7 @@ class _HomePageState extends State<HomePage> {
               _buildHeroSection(context),
               SizedBox(height: 32.h),
               if (_coupons.isNotEmpty) ...[
-                _buildSectionHeader("Exclusive Offers"),
+                _buildSectionHeader('exclusive_offers'.tr),
                 SizedBox(height: 16.h),
                 _buildCouponList(),
                 SizedBox(height: 40.h),
@@ -305,7 +306,7 @@ class _HomePageState extends State<HomePage> {
           controller: _searchController,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: "Search Services...",
+            hintText: 'search_services'.tr,
             hintStyle: TextStyle(color: Colors.white38, fontSize: 14.sp),
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
             border: InputBorder.none,
@@ -423,7 +424,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Services",
+            'services'.tr,
             style: TextStyle(
               fontSize: 22.sp,
               fontFamily: 'Playfair Display',
@@ -460,7 +461,7 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: EdgeInsets.only(top: 40.h),
           child: Text(
-            "No categories found",
+            'no_categories_found'.tr,
             style: TextStyle(color: Colors.white38, fontSize: 14.sp),
           ),
         ),

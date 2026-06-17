@@ -5,6 +5,9 @@ import 'package:easysaloonapp/core/theme/app_theme.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/splash_screen.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/login_screen.dart';
 import 'package:easysaloonapp/features/auth/presentation/pages/register_screen.dart';
+import 'package:easysaloonapp/features/auth/presentation/pages/language_selection_screen.dart';
+import 'package:easysaloonapp/core/localization/language_service.dart';
+import 'package:easysaloonapp/core/localization/app_translations.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/home_page.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/notifications_screen.dart';
 import 'package:easysaloonapp/features/home/presentation/pages/coupons_screen.dart';
@@ -45,6 +48,7 @@ import 'package:easysaloonapp/features/staff/staff_settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Get.putAsync(() => LanguageService().init());
   await Get.putAsync(() => AuthService().init());
   runApp(const MyApp());
 }
@@ -63,11 +67,15 @@ class MyApp extends StatelessWidget {
           title: 'Easy Saloon',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
+          translations: AppTranslations(),
+          locale: LanguageService.to.locale,
+          fallbackLocale: const Locale('en'),
           initialRoute: '/',
           getPages: [
             GetPage(name: '/', page: () => const SplashScreen()),
             GetPage(name: '/login', page: () => const LoginScreen()),
             GetPage(name: '/register', page: () => const RegisterScreen()),
+            GetPage(name: '/language-selection', page: () => const LanguageSelectionScreen()),
             GetPage(name: '/home', page: () => const HomePage()),
             GetPage(name: '/notifications', page: () => const NotificationsScreen()),
             GetPage(name: '/coupons', page: () => const CouponsScreen()),

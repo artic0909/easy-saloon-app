@@ -9,6 +9,7 @@ import 'package:easysaloonapp/core/network/api_service.dart';
 import 'package:easysaloonapp/core/widgets/app_bottom_nav.dart';
 import 'package:easysaloonapp/core/widgets/app_drawer.dart';
 import 'package:easysaloonapp/features/auth/data/services/auth_service.dart';
+import 'package:easysaloonapp/features/auth/presentation/pages/language_selection_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -692,6 +693,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onPressed: _showChangePasswordSheet,
               child: Text(
                 "Change Password",
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14.sp),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Get.to(() => const LanguageSelectionScreen(isFromProfile: true)),
+              child: Text(
+                'change_language'.tr,
                 style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14.sp),
               ),
             ),
